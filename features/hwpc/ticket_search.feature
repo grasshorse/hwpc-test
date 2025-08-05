@@ -62,7 +62,7 @@ Feature: Scenarios related to search tickets
     @sanity @performance @web
     Scenario: Search performance verification
         Given user is on tickets page
-        And I pause for debugging
+#        And I pause for debugging
         When the user searches for ticket "Mark"
         Then the search should complete within 5 seconds
         And user should see "Mark" ticket displayed on search result
