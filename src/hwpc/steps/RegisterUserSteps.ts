@@ -2,7 +2,7 @@ import { Given, Then, When } from "@cucumber/cucumber";
 import StringUtil from "../../support/utils/StringUtil";
 import CommonPage from "../pages/CommonPage";
 import RegisterUserPage from "../pages/RegisterUserPage";
-
+/*
 Given('user navigate to registration page', async function () {
     await new CommonPage(this.web).navigateToRegisterUser();
 });
@@ -27,4 +27,4 @@ Then('user logs out of application', async function () {
 When('I pause for debugging', async function() {
     // This will pause the execution and open Playwright Inspector
     await this.page.pause();
-});
+}); */

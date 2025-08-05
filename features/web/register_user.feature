@@ -8,6 +8,7 @@ Feature: Scenarios related to register user
     @sanity
     Scenario Outline: register a new user
         Given user navigate to registration page
+        And I pause for debugging
         When the user enters the registration details "<firstName>", "<lastName>", "<email>", "<telephone>", "<password>", "<confirmPassword>", "<subscribe>"
         Then user should see a message "Your Account Has Been Created!"
         Then user logs out of application
