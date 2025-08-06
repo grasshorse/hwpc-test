@@ -1,3 +1,8 @@
+/**
+ * HWPC Constants - Comprehensive UI element selectors and configuration constants
+ * Enhanced with comprehensive selectors for tickets, customers, routes, and mobile-first testing
+ */
+
 export default class Constants {
     // Legacy constants (keeping for backward compatibility)
     static readonly PRODUCT = "Product";
@@ -42,6 +47,36 @@ export default class Constants {
     static readonly TICKET_CREATED_DATE = "Ticket Created Date";
     static readonly TICKET_UPDATED_DATE = "Ticket Updated Date";
     static readonly TICKET_ASSIGNEE = "Ticket Assignee";
+    
+    // Enhanced Ticket Management Selectors
+    static readonly TICKET_CREATE_BUTTON = "[data-testid='create-ticket-btn'], .create-ticket-btn, #createTicketBtn";
+    static readonly TICKET_EDIT_BUTTON = "[data-testid='edit-ticket-btn'], .edit-ticket-btn, .ticket-edit";
+    static readonly TICKET_DELETE_BUTTON = "[data-testid='delete-ticket-btn'], .delete-ticket-btn, .ticket-delete";
+    static readonly TICKET_STATUS_DROPDOWN = "[data-testid='ticket-status-select'], .ticket-status-select, #ticketStatus";
+    static readonly TICKET_PRIORITY_DROPDOWN = "[data-testid='ticket-priority-select'], .ticket-priority-select, #ticketPriority";
+    static readonly TICKET_ASSIGNEE_DROPDOWN = "[data-testid='ticket-assignee-select'], .ticket-assignee-select, #ticketAssignee";
+    static readonly TICKET_CUSTOMER_DROPDOWN = "[data-testid='ticket-customer-select'], .ticket-customer-select, #ticketCustomer";
+    static readonly TICKET_SERVICE_TYPE_DROPDOWN = "[data-testid='ticket-service-type-select'], .service-type-select, #serviceType";
+    static readonly TICKET_SCHEDULED_DATE_INPUT = "[data-testid='ticket-scheduled-date'], .scheduled-date-input, #scheduledDate";
+    static readonly TICKET_ESTIMATED_DURATION_INPUT = "[data-testid='ticket-duration'], .duration-input, #estimatedDuration";
+    static readonly TICKET_SPECIAL_INSTRUCTIONS_TEXTAREA = "[data-testid='ticket-instructions'], .special-instructions, #specialInstructions";
+    
+    // Ticket List and Search Selectors
+    static readonly TICKET_SEARCH_INPUT = "[data-testid='ticket-search'], .ticket-search-input, #ticketSearch";
+    static readonly TICKET_FILTER_BUTTON = "[data-testid='ticket-filter-btn'], .filter-btn, .ticket-filter";
+    static readonly TICKET_SORT_DROPDOWN = "[data-testid='ticket-sort'], .sort-dropdown, #ticketSort";
+    static readonly TICKET_VIEW_TOGGLE = "[data-testid='view-toggle'], .view-toggle-btn, .list-grid-toggle";
+    static readonly TICKET_BULK_SELECT_CHECKBOX = "[data-testid='bulk-select'], .bulk-select-checkbox, .select-all";
+    static readonly TICKET_BULK_ACTIONS_DROPDOWN = "[data-testid='bulk-actions'], .bulk-actions-dropdown, #bulkActions";
+    
+    // Ticket Detail View Selectors
+    static readonly TICKET_DETAIL_CONTAINER = "[data-testid='ticket-detail'], .ticket-detail-container, .ticket-view";
+    static readonly TICKET_HISTORY_SECTION = "[data-testid='ticket-history'], .ticket-history, .activity-log";
+    static readonly TICKET_COMMENTS_SECTION = "[data-testid='ticket-comments'], .ticket-comments, .comments-section";
+    static readonly TICKET_ATTACHMENTS_SECTION = "[data-testid='ticket-attachments'], .ticket-attachments, .attachments";
+    static readonly TICKET_ADD_COMMENT_BUTTON = "[data-testid='add-comment-btn'], .add-comment-btn, #addComment";
+    static readonly TICKET_COMMENT_TEXTAREA = "[data-testid='comment-text'], .comment-textarea, #commentText";
+    static readonly TICKET_ATTACH_FILE_BUTTON = "[data-testid='attach-file-btn'], .attach-file-btn, #attachFile";
 
     // ===== HWPC NAVIGATION ELEMENTS =====
     static readonly NAVIGATION_MENU = "Navigation Menu";
@@ -165,11 +200,100 @@ export default class Constants {
     static readonly CSS_TABLET_MEDIA_QUERY = "(min-width: 768px) and (max-width: 1023px)";
     static readonly CSS_DESKTOP_MEDIA_QUERY = "(min-width: 1024px)";
 
+    // ===== CUSTOMER MANAGEMENT ELEMENTS =====
+    
+    // Customer List and Search Selectors
+    static readonly CUSTOMER_LIST_CONTAINER = "[data-testid='customer-list'], .customer-list-container, .customers-grid";
+    static readonly CUSTOMER_SEARCH_INPUT = "[data-testid='customer-search'], .customer-search-input, #customerSearch";
+    static readonly CUSTOMER_FILTER_BUTTON = "[data-testid='customer-filter-btn'], .customer-filter-btn, .filter-customers";
+    static readonly CUSTOMER_CREATE_BUTTON = "[data-testid='create-customer-btn'], .create-customer-btn, #createCustomerBtn";
+    static readonly CUSTOMER_SORT_DROPDOWN = "[data-testid='customer-sort'], .customer-sort-dropdown, #customerSort";
+    static readonly CUSTOMER_VIEW_TOGGLE = "[data-testid='customer-view-toggle'], .customer-view-toggle, .grid-list-toggle";
+    
+    // Customer Form Selectors
+    static readonly CUSTOMER_COMPANY_NAME_INPUT = "[data-testid='customer-company'], .company-name-input, #companyName";
+    static readonly CUSTOMER_CONTACT_NAME_INPUT = "[data-testid='customer-contact'], .contact-name-input, #contactName";
+    static readonly CUSTOMER_PHONE_INPUT = "[data-testid='customer-phone'], .phone-input, #customerPhone";
+    static readonly CUSTOMER_EMAIL_INPUT = "[data-testid='customer-email'], .email-input, #customerEmail";
+    static readonly CUSTOMER_ADDRESS_INPUT = "[data-testid='customer-address'], .address-input, #customerAddress";
+    static readonly CUSTOMER_CITY_INPUT = "[data-testid='customer-city'], .city-input, #customerCity";
+    static readonly CUSTOMER_STATE_DROPDOWN = "[data-testid='customer-state'], .state-dropdown, #customerState";
+    static readonly CUSTOMER_ZIP_INPUT = "[data-testid='customer-zip'], .zip-input, #customerZip";
+    static readonly CUSTOMER_SERVICE_TYPE_CHECKBOXES = "[data-testid='service-types'], .service-type-checkbox, .service-options";
+    static readonly CUSTOMER_PREFERRED_TECHNICIAN_DROPDOWN = "[data-testid='preferred-tech'], .preferred-tech-select, #preferredTechnician";
+    static readonly CUSTOMER_SPECIAL_INSTRUCTIONS_TEXTAREA = "[data-testid='customer-instructions'], .customer-instructions, #customerInstructions";
+    
+    // Customer Detail View Selectors
+    static readonly CUSTOMER_DETAIL_CONTAINER = "[data-testid='customer-detail'], .customer-detail-container, .customer-profile";
+    static readonly CUSTOMER_EDIT_BUTTON = "[data-testid='edit-customer-btn'], .edit-customer-btn, .customer-edit";
+    static readonly CUSTOMER_DELETE_BUTTON = "[data-testid='delete-customer-btn'], .delete-customer-btn, .customer-delete";
+    static readonly CUSTOMER_SERVICE_HISTORY_SECTION = "[data-testid='service-history'], .service-history, .customer-history";
+    static readonly CUSTOMER_TICKETS_SECTION = "[data-testid='customer-tickets'], .customer-tickets, .related-tickets";
+    static readonly CUSTOMER_NOTES_SECTION = "[data-testid='customer-notes'], .customer-notes, .notes-section";
+    static readonly CUSTOMER_ADD_NOTE_BUTTON = "[data-testid='add-note-btn'], .add-note-btn, #addCustomerNote";
+    
+    // ===== ROUTE MANAGEMENT ELEMENTS =====
+    
+    // Route List and Planning Selectors
+    static readonly ROUTE_LIST_CONTAINER = "[data-testid='route-list'], .route-list-container, .routes-grid";
+    static readonly ROUTE_CREATE_BUTTON = "[data-testid='create-route-btn'], .create-route-btn, #createRouteBtn";
+    static readonly ROUTE_DATE_PICKER = "[data-testid='route-date'], .route-date-picker, #routeDate";
+    static readonly ROUTE_TECHNICIAN_DROPDOWN = "[data-testid='route-technician'], .technician-select, #routeTechnician";
+    static readonly ROUTE_NAME_INPUT = "[data-testid='route-name'], .route-name-input, #routeName";
+    static readonly ROUTE_STATUS_DROPDOWN = "[data-testid='route-status'], .route-status-select, #routeStatus";
+    
+    // Route Planning and Optimization Selectors
+    static readonly ROUTE_PLANNING_CONTAINER = "[data-testid='route-planning'], .route-planning-container, .route-builder";
+    static readonly ROUTE_UNASSIGNED_TICKETS = "[data-testid='unassigned-tickets'], .unassigned-tickets, .available-tickets";
+    static readonly ROUTE_ASSIGNED_TICKETS = "[data-testid='assigned-tickets'], .assigned-tickets, .route-tickets";
+    static readonly ROUTE_DRAG_DROP_ZONE = "[data-testid='drag-drop-zone'], .drag-drop-zone, .sortable-list";
+    static readonly ROUTE_OPTIMIZE_BUTTON = "[data-testid='optimize-route-btn'], .optimize-route-btn, #optimizeRoute";
+    static readonly ROUTE_MAP_CONTAINER = "[data-testid='route-map'], .route-map-container, .map-view";
+    static readonly ROUTE_DIRECTIONS_PANEL = "[data-testid='route-directions'], .directions-panel, .route-steps";
+    
+    // Route Actions and Export Selectors
+    static readonly ROUTE_PRINT_BUTTON = "[data-testid='print-route-btn'], .print-route-btn, #printRoute";
+    static readonly ROUTE_EXPORT_BUTTON = "[data-testid='export-route-btn'], .export-route-btn, #exportRoute";
+    static readonly ROUTE_SHARE_BUTTON = "[data-testid='share-route-btn'], .share-route-btn, #shareRoute";
+    static readonly ROUTE_DUPLICATE_BUTTON = "[data-testid='duplicate-route-btn'], .duplicate-route-btn, #duplicateRoute";
+    static readonly ROUTE_DELETE_BUTTON = "[data-testid='delete-route-btn'], .delete-route-btn, .route-delete";
+    
+    // Route Print Preview Selectors
+    static readonly ROUTE_PRINT_PREVIEW = "[data-testid='print-preview'], .print-preview-container, .route-print-view";
+    static readonly ROUTE_PRINT_OPTIONS = "[data-testid='print-options'], .print-options-panel, .print-settings";
+    static readonly ROUTE_PRINT_FORMAT_DROPDOWN = "[data-testid='print-format'], .print-format-select, #printFormat";
+    static readonly ROUTE_INCLUDE_MAP_CHECKBOX = "[data-testid='include-map'], .include-map-checkbox, #includeMap";
+    static readonly ROUTE_INCLUDE_DIRECTIONS_CHECKBOX = "[data-testid='include-directions'], .include-directions-checkbox, #includeDirections";
+    
+    // ===== DASHBOARD AND REPORTING ELEMENTS =====
+    
+    // Dashboard Selectors
+    static readonly DASHBOARD_CONTAINER = "[data-testid='dashboard'], .dashboard-container, .main-dashboard";
+    static readonly DASHBOARD_STATS_CARDS = "[data-testid='stats-cards'], .stats-cards, .dashboard-metrics";
+    static readonly DASHBOARD_CHARTS_SECTION = "[data-testid='dashboard-charts'], .charts-section, .analytics-charts";
+    static readonly DASHBOARD_RECENT_TICKETS = "[data-testid='recent-tickets'], .recent-tickets, .latest-tickets";
+    static readonly DASHBOARD_ACTIVE_ROUTES = "[data-testid='active-routes'], .active-routes, .current-routes";
+    static readonly DASHBOARD_NOTIFICATIONS = "[data-testid='notifications'], .notifications-panel, .alerts-section";
+    
+    // Reporting Selectors
+    static readonly REPORTS_CONTAINER = "[data-testid='reports'], .reports-container, .reports-section";
+    static readonly REPORT_TYPE_DROPDOWN = "[data-testid='report-type'], .report-type-select, #reportType";
+    static readonly REPORT_DATE_RANGE_PICKER = "[data-testid='date-range'], .date-range-picker, .report-dates";
+    static readonly REPORT_GENERATE_BUTTON = "[data-testid='generate-report-btn'], .generate-report-btn, #generateReport";
+    static readonly REPORT_EXPORT_BUTTON = "[data-testid='export-report-btn'], .export-report-btn, #exportReport";
+    static readonly REPORT_RESULTS_CONTAINER = "[data-testid='report-results'], .report-results, .report-output";
+    
     // ===== MOBILE-SPECIFIC CSS CLASSES =====
     static readonly MOBILE_HIDDEN_CLASS = "d-none d-md-block";
     static readonly MOBILE_VISIBLE_CLASS = "d-block d-md-none";
     static readonly RESPONSIVE_CONTAINER_CLASS = "container-fluid";
     static readonly MOBILE_NAVIGATION_CLASS = "navbar-collapse";
+
+    // ===== HOME PAGE SPECIFIC ELEMENTS =====
+    static readonly HERO_SECTION = ".hero, .hero-section, .banner, [data-hero]";
+    static readonly SEARCH_SECTION = ".search-section, .home-search, [data-search-section]";
+    static readonly QUICK_ACTIONS = ".quick-actions, .action-buttons, [data-quick-actions]";
+    static readonly FEATURE_CARDS = ".feature-cards, .features, .home-features, [data-features]";
 
     // ===== TOUCH INTERACTION CONSTANTS =====
     static readonly TOUCH_START_EVENT = "touchstart";
@@ -192,7 +316,6 @@ export default class Constants {
 
     // ===== MOBILE NAVIGATION PATTERNS =====
     static readonly HAMBURGER_MENU_SELECTOR = ".navbar-toggler, .hamburger, .mobile-menu-btn";
-    static readonly MOBILE_MENU_OVERLAY = ".mobile-menu-overlay, .navbar-backdrop";
     static readonly MOBILE_MENU_SLIDE_DURATION = 300;
     static readonly MOBILE_MENU_FADE_DURATION = 200;
 
@@ -218,6 +341,51 @@ export default class Constants {
     static readonly MOBILE_FILTER_SELECTOR = ".mobile-filter, .filter-mobile, [data-mobile-filter]";
     static readonly MOBILE_SORT_SELECTOR = ".mobile-sort, .sort-mobile, [data-mobile-sort]";
     static readonly MOBILE_PAGINATION_SELECTOR = ".mobile-pagination, .pagination-mobile";
+    
+    // Mobile Navigation Selectors
+    static readonly MOBILE_MENU_BUTTON = "[data-testid='mobile-menu-btn'], .mobile-menu-btn, .hamburger-menu";
+    static readonly MOBILE_MENU_OVERLAY = "[data-testid='mobile-overlay'], .mobile-menu-overlay, .menu-backdrop";
+    static readonly MOBILE_MENU_CLOSE_BUTTON = "[data-testid='mobile-close-btn'], .mobile-close-btn, .menu-close";
+    static readonly MOBILE_BOTTOM_NAV = "[data-testid='bottom-nav'], .bottom-navigation, .mobile-bottom-nav";
+    static readonly MOBILE_TAB_BAR = "[data-testid='tab-bar'], .tab-bar, .mobile-tabs";
+    
+    // Mobile Form Selectors
+    static readonly MOBILE_FORM_CONTAINER = "[data-testid='mobile-form'], .mobile-form-container, .form-mobile";
+    static readonly MOBILE_INPUT_GROUP = "[data-testid='mobile-input-group'], .mobile-input-group, .input-group-mobile";
+    static readonly MOBILE_FLOATING_LABEL = "[data-testid='floating-label'], .floating-label, .form-floating";
+    static readonly MOBILE_KEYBOARD_TOOLBAR = "[data-testid='keyboard-toolbar'], .keyboard-toolbar, .input-toolbar";
+    
+    // Mobile List and Card Selectors
+    static readonly MOBILE_CARD_CONTAINER = "[data-testid='mobile-card'], .mobile-card, .card-mobile";
+    static readonly MOBILE_LIST_ITEM = "[data-testid='mobile-list-item'], .mobile-list-item, .list-item-mobile";
+    static readonly MOBILE_SWIPE_ACTIONS = "[data-testid='swipe-actions'], .swipe-actions, .mobile-actions";
+    static readonly MOBILE_PULL_TO_REFRESH = "[data-testid='pull-refresh'], .pull-to-refresh, .refresh-trigger";
+    static readonly MOBILE_INFINITE_SCROLL = "[data-testid='infinite-scroll'], .infinite-scroll, .load-more-trigger";
+    
+    // Mobile Modal and Dialog Selectors
+    static readonly MOBILE_MODAL_CONTAINER = "[data-testid='mobile-modal'], .mobile-modal, .modal-mobile";
+    static readonly MOBILE_BOTTOM_SHEET = "[data-testid='bottom-sheet'], .bottom-sheet, .mobile-drawer";
+    static readonly MOBILE_ACTION_SHEET = "[data-testid='action-sheet'], .action-sheet, .mobile-actions-menu";
+    static readonly MOBILE_TOAST_NOTIFICATION = "[data-testid='mobile-toast'], .mobile-toast, .toast-mobile";
+    
+    // Mobile Touch Interaction Selectors
+    static readonly MOBILE_TOUCH_TARGET = "[data-testid='touch-target'], .touch-target, .mobile-clickable";
+    static readonly MOBILE_DRAG_HANDLE = "[data-testid='drag-handle'], .drag-handle, .mobile-drag";
+    static readonly MOBILE_SWIPE_CONTAINER = "[data-testid='swipe-container'], .swipe-container, .swipeable";
+    static readonly MOBILE_PINCH_ZOOM_CONTAINER = "[data-testid='pinch-zoom'], .pinch-zoom, .zoomable";
+    
+    // Mobile-Specific Feature Selectors
+    static readonly MOBILE_CAMERA_BUTTON = "[data-testid='camera-btn'], .camera-btn, .mobile-camera";
+    static readonly MOBILE_GPS_BUTTON = "[data-testid='gps-btn'], .gps-btn, .location-btn";
+    static readonly MOBILE_PHONE_LINK = "[data-testid='phone-link'], .phone-link, .tel-link";
+    static readonly MOBILE_EMAIL_LINK = "[data-testid='email-link'], .email-link, .mailto-link";
+    static readonly MOBILE_SHARE_BUTTON = "[data-testid='mobile-share'], .mobile-share, .share-native";
+    
+    // Mobile Performance and Loading Selectors
+    static readonly MOBILE_LOADING_SPINNER = "[data-testid='mobile-loading'], .mobile-loading, .spinner-mobile";
+    static readonly MOBILE_SKELETON_LOADER = "[data-testid='skeleton-loader'], .skeleton-loader, .loading-skeleton";
+    static readonly MOBILE_LAZY_IMAGE = "[data-testid='lazy-image'], .lazy-image, .img-lazy";
+    static readonly MOBILE_OFFLINE_INDICATOR = "[data-testid='offline-indicator'], .offline-indicator, .connection-status";
 
     // ===== RESPONSIVE IMAGE CONSTANTS =====
     static readonly MOBILE_IMAGE_QUALITY = 0.8;

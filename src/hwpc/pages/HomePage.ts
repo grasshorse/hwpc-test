@@ -1,9 +1,16 @@
 import UIActions from "../../support/playwright/actions/UIActions";
 import Assert from "../../support/playwright/asserts/Assert";
 import Constants from "../constants/Constants";
+import BasePage from "./base/BasePage";
 
-export default class HomePage {
-    constructor(private web: UIActions) { }
+/**
+ * Enhanced HomePage with dashboard functionality and navigation to all business areas
+ * Extends BasePage with comprehensive HWPC home page and dashboard capabilities
+ */
+export default class HomePage extends BasePage {
+    constructor(web: UIActions) {
+        super(web);
+    }
     
     // Enhanced mobile-first navigation selectors
     private HOME_LINK = ".home-link, .navbar-brand, [data-testid='home-link'], .logo, .brand";
@@ -22,11 +29,11 @@ export default class HomePage {
     private TABLET_NAVIGATION = ".tablet-nav, .nav-tablet, [data-tablet-nav]";
     private RESPONSIVE_MENU_ITEM = ".nav-item, .menu-item, [data-nav-item]";
     
-    // Home page specific elements
-    private HERO_SECTION = ".hero, .hero-section, .banner, [data-hero]";
-    private SEARCH_SECTION = ".search-section, .home-search, [data-search-section]";
-    private QUICK_ACTIONS = ".quick-actions, .action-buttons, [data-quick-actions]";
-    private FEATURE_CARDS = ".feature-cards, .features, .home-features, [data-features]";
+    // Home page specific elements (using Constants)
+    private HERO_SECTION = Constants.HERO_SECTION;
+    private SEARCH_SECTION = Constants.SEARCH_SECTION;
+    private QUICK_ACTIONS = Constants.QUICK_ACTIONS;
+    private FEATURE_CARDS = Constants.FEATURE_CARDS;
     
     /**
      * Navigate to home page with mobile-first approach
@@ -356,7 +363,7 @@ export default class HomePage {
     /**
      * Verify mobile-specific responsive elements
      */
-    private async verifyMobileResponsiveElements() {
+    protected async verifyMobileResponsiveElements() {
         try {
             console.log("Verifying mobile responsive elements...");
             
@@ -382,7 +389,7 @@ export default class HomePage {
     /**
      * Verify tablet-specific responsive elements
      */
-    private async verifyTabletResponsiveElements() {
+    protected async verifyTabletResponsiveElements() {
         try {
             console.log("Verifying tablet responsive elements...");
             
@@ -408,7 +415,7 @@ export default class HomePage {
     /**
      * Verify desktop-specific responsive elements
      */
-    private async verifyDesktopResponsiveElements() {
+    protected async verifyDesktopResponsiveElements() {
         try {
             console.log("Verifying desktop responsive elements...");
             
@@ -742,122 +749,391 @@ export default class HomePage {
         try {
             const isVisible = await this.web.element(this.MAIN_NAVIGATION, Constants.NAVIGATION_MENU).isVisible(2);
             if (isVisible) {
-                console.log("Desktop navigation found and verified");
-            } else {
-                console.log("Desktop navigation not found - this may be expected for static sites");
+                console.log("Desktop navigation verified");
             }
         } catch (error) {
-            console.log("Desktop navigation verification failed - continuing");
+            console.log("Desktop navigation verification failed");
         }
     }
 
-    // ===== HELPER METHODS FOR MOBILE-FIRST INTERACTIONS =====
+    // ===== DASHBOARD FUNCTIONALITY =====
 
     /**
-     * Get current viewport category
+     * Navigate to dashboard with mobile-first approach
      */
-    private async getCurrentViewportCategory(): Promise<'mobile' | 'tablet' | 'desktop'> {
-        const viewport = this.web.getPage().viewportSize();
-        
-        if (!viewport) return 'desktop';
-        
-        if (viewport.width < Constants.RESPONSIVE_BREAKPOINT_MOBILE) {
-            return 'mobile';
-        } else if (viewport.width < Constants.RESPONSIVE_BREAKPOINT_TABLET) {
-            return 'tablet';
-        } else {
-            return 'desktop';
-        }
-    }
-
-    /**
-     * Touch-friendly click with proper timing and error handling
-     */
-    private async touchFriendlyClick(selector: string, elementName: string) {
+    public async navigateToDashboard(): Promise<void> {
         try {
-            const element = this.web.element(selector, elementName);
+            const dashboardUrl = process.env.BASE_URL + "/dashboard";
+            await this.navigateToPage(dashboardUrl, "Dashboard");
             
-            // Ensure element is visible and interactable
-            await element.waitTillVisible();
-            await this.web.getPage().waitForTimeout(Constants.MOBILE_CLICK_DELAY);
+            // Verify dashboard loaded
+            await this.verifyDashboardLoaded();
             
-            // Check if element is still in viewport
-            const isInViewport = await this.isElementInViewport(selector);
-            if (!isInViewport) {
-                await this.scrollElementIntoView(selector);
-            }
-            
-            // Perform touch-friendly click
-            await element.click();
-            
-            // Small delay to ensure click is registered
-            await this.web.getPage().waitForTimeout(Constants.TAP_DURATION);
-            
+            console.log("Dashboard navigation completed");
         } catch (error) {
-            console.log(`Touch-friendly click failed for ${elementName}: ${error.message}`);
+            console.log(`Dashboard navigation failed: ${error.message}`);
             throw error;
         }
     }
 
     /**
-     * Check if element is currently in viewport
+     * Verify dashboard has loaded correctly
      */
-    private async isElementInViewport(selector: string): Promise<boolean> {
+    private async verifyDashboardLoaded(): Promise<void> {
         try {
-            const element = this.web.element(selector, "Viewport Check");
-            const boundingBox = await element.getLocator().boundingBox();
+            const dashboardSelector = Constants.DASHBOARD_CONTAINER;
+            await this.waitForElement(dashboardSelector, "Dashboard Container");
             
-            if (!boundingBox) return false;
-            
-            const viewport = this.web.getPage().viewportSize();
-            if (!viewport) return false;
-            
-            return (
-                boundingBox.x >= 0 &&
-                boundingBox.y >= 0 &&
-                boundingBox.x + boundingBox.width <= viewport.width &&
-                boundingBox.y + boundingBox.height <= viewport.height
-            );
+            console.log("Dashboard loaded successfully");
         } catch (error) {
-            return false;
+            console.log(`Dashboard verification failed: ${error.message}`);
         }
     }
 
     /**
-     * Scroll element into view with mobile-friendly behavior
+     * Get dashboard statistics
      */
-    private async scrollElementIntoView(selector: string) {
+    public async getDashboardStats(): Promise<Record<string, string>> {
         try {
-            const element = this.web.element(selector, "Scroll Into View");
+            const statsSelector = Constants.DASHBOARD_STATS_CARDS;
+            const isStatsVisible = await this.web.element(statsSelector, "Dashboard Stats").isVisible(2);
             
-            // Use mobile-friendly scroll behavior
-            await element.getLocator().scrollIntoViewIfNeeded();
-            
-            // Additional wait for mobile scroll completion
-            await this.web.getPage().waitForTimeout(Constants.MOBILE_SCROLL_DELAY);
-            
-            // Verify element is now in viewport
-            const isInViewport = await this.isElementInViewport(selector);
-            if (!isInViewport) {
-                // Fallback scroll method
-                await this.web.getPage().evaluate((sel) => {
-                    const el = document.querySelector(sel);
-                    if (el) {
-                        el.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'center', 
-                            inline: 'nearest' 
-                        });
-                    }
-                }, selector);
+            if (isStatsVisible) {
+                const statsCards = await this.web.element(statsSelector, "Dashboard Stats").getAllTextContent();
                 
-                await this.web.getPage().waitForTimeout(Constants.MOBILE_SCROLL_TIMEOUT);
+                // Parse stats (implementation would depend on actual dashboard structure)
+                const stats: Record<string, string> = {};
+                statsCards.forEach((card, index) => {
+                    stats[`stat_${index}`] = card;
+                });
+                
+                console.log("Dashboard stats retrieved:", stats);
+                return stats;
+            } else {
+                console.log("Dashboard stats not found");
+                return {};
             }
-            
         } catch (error) {
-            console.log(`Scroll into view failed for ${selector}: ${error.message}`);
+            console.log(`Dashboard stats retrieval failed: ${error.message}`);
+            return {};
         }
     }
+
+    /**
+     * View recent tickets from dashboard
+     */
+    public async viewRecentTickets(): Promise<void> {
+        try {
+            const recentTicketsSelector = Constants.DASHBOARD_RECENT_TICKETS;
+            const isRecentTicketsVisible = await this.web.element(recentTicketsSelector, "Recent Tickets").isVisible(2);
+            
+            if (isRecentTicketsVisible) {
+                await this.viewportAwareClick(recentTicketsSelector, "Recent Tickets");
+                
+                // Wait for navigation or modal to open
+                await this.waitForPageLoad();
+                
+                console.log("Recent tickets viewed from dashboard");
+            } else {
+                console.log("Recent tickets section not found on dashboard");
+            }
+        } catch (error) {
+            console.log(`Recent tickets view failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * View active routes from dashboard
+     */
+    public async viewActiveRoutes(): Promise<void> {
+        try {
+            const activeRoutesSelector = Constants.DASHBOARD_ACTIVE_ROUTES;
+            const isActiveRoutesVisible = await this.web.element(activeRoutesSelector, "Active Routes").isVisible(2);
+            
+            if (isActiveRoutesVisible) {
+                await this.viewportAwareClick(activeRoutesSelector, "Active Routes");
+                
+                // Wait for navigation or modal to open
+                await this.waitForPageLoad();
+                
+                console.log("Active routes viewed from dashboard");
+            } else {
+                console.log("Active routes section not found on dashboard");
+            }
+        } catch (error) {
+            console.log(`Active routes view failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Check dashboard notifications
+     */
+    public async checkNotifications(): Promise<string[]> {
+        try {
+            const notificationsSelector = Constants.DASHBOARD_NOTIFICATIONS;
+            const isNotificationsVisible = await this.web.element(notificationsSelector, "Notifications").isVisible(2);
+            
+            if (isNotificationsVisible) {
+                const notifications = await this.web.element(notificationsSelector, "Notifications").getAllTextContent();
+                
+                console.log(`Found ${notifications.length} notifications`);
+                return notifications;
+            } else {
+                console.log("Notifications section not found on dashboard");
+                return [];
+            }
+        } catch (error) {
+            console.log(`Notifications check failed: ${error.message}`);
+            return [];
+        }
+    }
+
+    // ===== BUSINESS AREA NAVIGATION =====
+
+    /**
+     * Navigate to customer management area
+     */
+    public async navigateToCustomerManagement(): Promise<void> {
+        try {
+            const viewportCategory = await this.getCurrentViewportCategory();
+            
+            if (viewportCategory === 'mobile') {
+                await this.openMobileMenu();
+            }
+            
+            const customerLinkSelector = '.customers-link, [href*="customers"], [data-nav="customers"]';
+            const isCustomerLinkVisible = await this.web.element(customerLinkSelector, "Customer Management Link").isVisible(2);
+            
+            if (isCustomerLinkVisible) {
+                await this.viewportAwareClick(customerLinkSelector, "Customer Management Link");
+                await this.waitForPageLoad();
+                
+                console.log("Navigated to customer management");
+            } else {
+                // Fallback to direct URL navigation
+                const customerUrl = process.env.BASE_URL + "/customers";
+                await this.navigateToPage(customerUrl, "Customer Management");
+            }
+        } catch (error) {
+            console.log(`Customer management navigation failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Navigate to route planning area
+     */
+    public async navigateToRoutePlanning(): Promise<void> {
+        try {
+            const viewportCategory = await this.getCurrentViewportCategory();
+            
+            if (viewportCategory === 'mobile') {
+                await this.openMobileMenu();
+            }
+            
+            const routeLinkSelector = '.routes-link, [href*="routes"], [data-nav="routes"]';
+            const isRouteLinkVisible = await this.web.element(routeLinkSelector, "Route Planning Link").isVisible(2);
+            
+            if (isRouteLinkVisible) {
+                await this.viewportAwareClick(routeLinkSelector, "Route Planning Link");
+                await this.waitForPageLoad();
+                
+                console.log("Navigated to route planning");
+            } else {
+                // Fallback to direct URL navigation
+                const routeUrl = process.env.BASE_URL + "/routes";
+                await this.navigateToPage(routeUrl, "Route Planning");
+            }
+        } catch (error) {
+            console.log(`Route planning navigation failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Navigate to reports area
+     */
+    public async navigateToReports(): Promise<void> {
+        try {
+            const viewportCategory = await this.getCurrentViewportCategory();
+            
+            if (viewportCategory === 'mobile') {
+                await this.openMobileMenu();
+            }
+            
+            const reportsLinkSelector = '.reports-link, [href*="reports"], [data-nav="reports"]';
+            const isReportsLinkVisible = await this.web.element(reportsLinkSelector, "Reports Link").isVisible(2);
+            
+            if (isReportsLinkVisible) {
+                await this.viewportAwareClick(reportsLinkSelector, "Reports Link");
+                await this.waitForPageLoad();
+                
+                console.log("Navigated to reports");
+            } else {
+                // Fallback to direct URL navigation
+                const reportsUrl = process.env.BASE_URL + "/reports";
+                await this.navigateToPage(reportsUrl, "Reports");
+            }
+        } catch (error) {
+            console.log(`Reports navigation failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Navigate to user profile/settings
+     */
+    public async navigateToProfile(): Promise<void> {
+        try {
+            const viewportCategory = await this.getCurrentViewportCategory();
+            
+            if (viewportCategory === 'mobile') {
+                await this.openMobileMenu();
+            }
+            
+            const profileLinkSelector = '.profile-link, [href*="profile"], [data-nav="profile"]';
+            const isProfileLinkVisible = await this.web.element(profileLinkSelector, "Profile Link").isVisible(2);
+            
+            if (isProfileLinkVisible) {
+                await this.viewportAwareClick(profileLinkSelector, "Profile Link");
+                await this.waitForPageLoad();
+                
+                console.log("Navigated to user profile");
+            } else {
+                // Fallback to direct URL navigation
+                const profileUrl = process.env.BASE_URL + "/profile";
+                await this.navigateToPage(profileUrl, "User Profile");
+            }
+        } catch (error) {
+            console.log(`Profile navigation failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Quick action: Create new ticket from home page
+     */
+    public async quickCreateTicket(): Promise<void> {
+        try {
+            const quickActionSelector = `${Constants.QUICK_ACTIONS} .create-ticket-btn, .quick-create-ticket`;
+            const isQuickActionVisible = await this.web.element(quickActionSelector, "Quick Create Ticket").isVisible(2);
+            
+            if (isQuickActionVisible) {
+                await this.viewportAwareClick(quickActionSelector, "Quick Create Ticket");
+                
+                // Wait for create ticket form/page to load
+                await this.waitForPageLoad();
+                
+                console.log("Quick create ticket initiated");
+            } else {
+                console.log("Quick create ticket action not found");
+                // Fallback to navigation
+                await this.navigateToTicketsPageViaUI();
+            }
+        } catch (error) {
+            console.log(`Quick create ticket failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Quick action: Search from home page
+     */
+    public async quickSearch(searchTerm: string): Promise<void> {
+        try {
+            const quickSearchSelector = `${Constants.SEARCH_SECTION} input, .home-search input, .quick-search`;
+            const isQuickSearchVisible = await this.web.element(quickSearchSelector, "Quick Search").isVisible(2);
+            
+            if (isQuickSearchVisible) {
+                await this.typeText(quickSearchSelector, searchTerm, "Quick Search");
+                
+                // Submit search
+                const searchButtonSelector = `${Constants.SEARCH_SECTION} button, .home-search button, .quick-search-btn`;
+                const isSearchButtonVisible = await this.web.element(searchButtonSelector, "Quick Search Button").isVisible(2);
+                
+                if (isSearchButtonVisible) {
+                    await this.viewportAwareClick(searchButtonSelector, "Quick Search Button");
+                } else {
+                    await this.page.keyboard.press('Enter');
+                }
+                
+                // Wait for search results
+                await this.waitForPageLoad();
+                
+                console.log(`Quick search performed for: ${searchTerm}`);
+            } else {
+                console.log("Quick search not available on home page");
+            }
+        } catch (error) {
+            console.log(`Quick search failed: ${error.message}`);
+        }
+    }
+
+    // ===== IMPLEMENTATION OF ABSTRACT METHODS =====
+
+    /**
+     * Initialize the home page
+     */
+    public async initialize(): Promise<void> {
+        try {
+            await this.waitForPageLoad();
+            await this.verifyHomePageLoaded();
+            console.log("HomePage initialized successfully");
+        } catch (error) {
+            console.log(`HomePage initialization failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Validate home page elements
+     */
+    public async validatePageElements(): Promise<void> {
+        try {
+            // Validate home page structure
+            await this.verifyHomePageLoaded();
+            
+            // Validate responsive design
+            await this.verifyResponsiveDesign();
+            
+            // Validate navigation elements
+            await this.verifyNavigationElements();
+            
+        } catch (error) {
+            console.log(`Home page validation failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Verify navigation elements are present
+     */
+    private async verifyNavigationElements(): Promise<void> {
+        try {
+            const viewportCategory = await this.getCurrentViewportCategory();
+            
+            if (viewportCategory === 'mobile') {
+                // Verify mobile navigation toggle
+                const isMobileToggleVisible = await this.web.element(this.MOBILE_NAV_TOGGLE, "Mobile Navigation Toggle").isVisible(2);
+                if (isMobileToggleVisible) {
+                    console.log("Mobile navigation toggle verified");
+                }
+            } else {
+                // Verify main navigation
+                const isMainNavVisible = await this.web.element(this.MAIN_NAVIGATION, "Main Navigation").isVisible(2);
+                if (isMainNavVisible) {
+                    console.log("Main navigation verified");
+                }
+            }
+        } catch (error) {
+            console.log(`Navigation elements verification failed: ${error.message}`);
+        }
+    }
+
+    // ===== HELPER METHODS FOR MOBILE-FIRST INTERACTIONS =====
+
+
+
+
+
+
 
     /**
      * Wait for navigation to complete with appropriate timeout

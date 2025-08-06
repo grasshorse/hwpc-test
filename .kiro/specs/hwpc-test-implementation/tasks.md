@@ -119,6 +119,10 @@
 
 
 - [ ] 4.2 Create HWPC API constants and endpoints
+
+
+
+
   - Define API endpoint constants following existing patterns
   - Add JSON path constants for response parsing
   - Include API-specific error codes and messages

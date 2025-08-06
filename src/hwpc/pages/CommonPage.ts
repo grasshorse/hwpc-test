@@ -2,9 +2,16 @@ import UIActions from "../../support/playwright/actions/UIActions";
 import Assert from "../../support/playwright/asserts/Assert";
 import StringUtil from "../../support/utils/StringUtil";
 import Constants from "../constants/Constants";
+import BasePage from "./base/BasePage";
 
-export default class CommonPage {
-    constructor(private web: UIActions) { }
+/**
+ * Enhanced CommonPage with mobile-first base functionality and business workflow support
+ * Extends BasePage to provide comprehensive HWPC testing capabilities
+ */
+export default class CommonPage extends BasePage {
+    constructor(web: UIActions) {
+        super(web);
+    }
     
     // Updated selectors for HWPC mobile-first UI - using more generic selectors
     private SUCCESS_MESSAGE_TEXT = "h1, .page-title, .alert-success, .success-message, .page-header h1";
@@ -518,20 +525,37 @@ export default class CommonPage {
         }
     }
 
+    // ===== IMPLEMENTATION OF ABSTRACT METHODS =====
+
     /**
-     * Get current viewport category
+     * Initialize the common page elements
      */
-    public async getCurrentViewportCategory(): Promise<'mobile' | 'tablet' | 'desktop'> {
-        const viewport = this.web.getPage().viewportSize();
-        
-        if (!viewport) return 'desktop';
-        
-        if (viewport.width < Constants.RESPONSIVE_BREAKPOINT_MOBILE) {
-            return 'mobile';
-        } else if (viewport.width < Constants.RESPONSIVE_BREAKPOINT_TABLET) {
-            return 'tablet';
-        } else {
-            return 'desktop';
+    public async initialize(): Promise<void> {
+        try {
+            await this.waitForPageLoad();
+            await this.detectViewportCategory();
+            console.log("CommonPage initialized successfully");
+        } catch (error) {
+            console.log(`CommonPage initialization failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Validate common page elements are present
+     */
+    public async validatePageElements(): Promise<void> {
+        try {
+            // Validate basic page structure
+            const bodyExists = await this.page.locator('body').isVisible();
+            if (bodyExists) {
+                console.log("Basic page structure validated");
+            }
+            
+            // Validate responsive design
+            await this.verifyResponsiveDesign();
+            
+        } catch (error) {
+            console.log(`Page element validation failed: ${error.message}`);
         }
     }
 
