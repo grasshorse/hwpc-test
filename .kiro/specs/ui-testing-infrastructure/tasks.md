@@ -3,39 +3,39 @@
 - [x] 1. Set up Node.js project structure and dependencies
 
   - Initialize npm project with package.json for testing dependencies
-  - Install cucumber.js, selenium-webdriver, chrome driver, and testing utilities
+  - Install cucumber.js, playwright, and testing utilities
   - Create directory structure for features, step-definitions, page-objects, and support files
   - Configure npm scripts for running tests in different modes (headless, headed, mobile)
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [x] 2. Configure Chrome WebDriver and browser management
+- [x] 2. Configure Playwright browser management
 
-  - [x] 2.1 Implement WebDriverManager class with Chrome configuration
+  - [x] 2.1 Implement BrowserManager class with multi-browser configuration
 
-    - Write WebDriverManager.js with Chrome options for headless and headed modes
+    - Write BrowserManager.js with Playwright options for headless and headed modes
     - Add mobile device emulation capabilities for responsive testing
     - Implement browser cleanup and resource management
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
   - [x] 2.2 Create browser configuration for different test scenarios
 
-    - Configure Chrome options for CI/CD pipeline (headless mode)
+    - Configure Playwright options for CI/CD pipeline (headless mode)
     - Set up mobile device emulation profiles for iPhone and iPad testing
     - Implement screenshot capture and debugging capabilities
     - _Requirements: 3.1, 3.2, 3.5, 7.1, 7.2_
 
 - [ ] 3. Implement base Page Object Model framework
-  - [ ] 3.1 Create BasePage class with common functionality
-    - Write BasePage.js with WebDriver wrapper methods (click, type, wait)
+  - [x] 3.1 Create BasePage class with common functionality
+    - Write BasePage.js with Playwright wrapper methods (click, type, wait)
     - Implement Google Sites iframe navigation and switching logic
     - Add screenshot capture and error handling methods
     - _Requirements: 4.1, 4.2, 4.6_
 
-  - [ ] 3.2 Implement authentication and Google Workspace integration
-    - Create LoginPage class for Google Workspace authentication flows
-    - Handle OAuth redirects and session management in tests
-    - Implement iframe detection and switching for Google Sites
-    - _Requirements: 4.6, 10.1, 10.3_
+  - [x] 3.2 Implement MVP mock authentication system
+    - Create MockAuthManager class for simulating authenticated user sessions
+    - Implement mock user "usermvp@hwpc.net" with appropriate permissions
+    - Add session state management and cleanup for tests
+    - _Requirements: 4.6, 10.1, 10.2, 10.3_
 
 - [ ] 4. Create feature files from existing pest control requirements
   - [ ] 4.1 Convert customer management requirements to Gherkin features
@@ -82,11 +82,11 @@
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 6. Implement step definitions library
-  - [ ] 6.1 Create common step definitions for navigation and authentication
-    - Write authentication-steps.js for login and session management
+  - [ ] 6.1 Create common step definitions for navigation and mock authentication
+    - Write mock-auth-steps.js for MVP user authentication simulation
     - Write navigation-steps.js for page navigation and menu interactions
     - Implement error handling and retry logic for flaky steps
-    - _Requirements: 5.1, 5.2, 5.5_
+    - _Requirements: 5.1, 5.2, 5.5, 10.1, 10.2_
 
   - [ ] 6.2 Create CRUD operation step definitions
     - Write customer-steps.js for customer management operations
@@ -123,7 +123,7 @@
 
 - [ ] 8. Create mobile and responsive testing capabilities
   - [ ] 8.1 Implement mobile device emulation testing
-    - Configure Chrome mobile device profiles for iPhone and iPad
+    - Configure Playwright mobile device profiles for iPhone and iPad
     - Write mobile-specific test scenarios for touch interactions
     - Implement viewport size testing and responsive layout validation
     - _Requirements: 7.1, 7.2, 7.3_
@@ -149,7 +149,7 @@
 
   - [ ] 9.2 Create CI/CD pipeline configuration
     - Write GitHub Actions workflow for automated UI testing
-    - Configure headless Chrome execution in CI environment
+    - Configure headless Playwright execution in CI environment
     - Set up test artifact collection and report publishing
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
@@ -174,11 +174,11 @@
     - Test concurrent user access and data conflict resolution
     - _Requirements: 10.2, 10.4_
 
-  - [ ] 10.3 Implement authentication and session management testing
-    - Test Google Workspace OAuth login flows and token refresh
-    - Verify session timeout handling and re-authentication
-    - Test role-based access control and permission validation
-    - _Requirements: 10.3, 10.5_
+  - [ ] 10.3 Implement MVP mock authentication testing (defer real auth until post-MVP)
+    - Test mock user session creation and management
+    - Verify mock authentication state persistence across page navigation
+    - Test mock user permissions and access control simulation
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
 - [ ] 11. Write comprehensive test execution and maintenance scripts
   - [ ] 11.1 Create test execution scripts for different scenarios

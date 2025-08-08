@@ -2,9 +2,9 @@
 
 ## Overview
 
-The UI testing infrastructure will provide comprehensive end-to-end testing capabilities for the pest control route management system using cucumber.js and Chrome WebDriver. The design leverages the existing Gherkin-like structure of the pest control requirements to create maintainable, behavior-driven tests that validate the entire user workflow from Google Sites frontend through Google Apps Script middleware to Google Sheets backend.
+The UI testing infrastructure will provide comprehensive end-to-end testing capabilities for the pest control route management system using cucumber.js and Playwright. The design leverages the existing Gherkin-like structure of the pest control requirements to create maintainable, behavior-driven tests that validate the entire user workflow from Google Sites frontend through Google Apps Script middleware to Google Sheets backend.
 
-The testing framework follows modern testing practices including the Page Object Model, data-driven testing, and CI/CD integration while specifically addressing the unique challenges of testing Google Workspace applications with embedded iframes and authentication flows.
+The testing framework follows modern testing practices including the Page Object Model, data-driven testing, and CI/CD integration while specifically addressing the unique challenges of testing Google Workspace applications with embedded iframes. For MVP development, authentication is handled through a mock user system to avoid login/encryption complexities during core workflow development.
 
 ## Architecture
 
@@ -15,7 +15,7 @@ graph TB
     A[Cucumber.js Test Runner] --> B[Feature Files]
     A --> C[Step Definitions]
     C --> D[Page Object Model]
-    D --> E[Chrome WebDriver]
+    D --> E[Playwright Browser]
     E --> F[Google Sites Application]
     
     subgraph TestFramework ["Test Framework Components"]
@@ -27,7 +27,7 @@ graph TB
     end
     
     subgraph PageObjects ["Page Objects"]
-        D1[LoginPage]
+        D1[MockAuthPage]
         D2[DashboardPage]
         D3[TicketPage]
         D4[RoutePage]
@@ -74,13 +74,13 @@ graph TB
 ### Technology Stack
 
 - **Test Framework**: Cucumber.js (Gherkin BDD)
-- **Browser Automation**: Selenium WebDriver with Chrome
+- **Browser Automation**: Playwright (Chrome, Firefox, Safari)
 - **Test Runner**: Node.js with npm scripts
-- **Page Object Framework**: Custom implementation with WebDriver
+- **Page Object Framework**: Custom implementation with Playwright
 - **Test Data**: JSON fixtures and Google Sheets API
 - **Reporting**: Cucumber HTML Reporter, Allure Reports
 - **CI/CD**: GitHub Actions / Jenkins compatible
-- **Mobile Testing**: Chrome DevTools Device Emulation
+- **Mobile Testing**: Playwright Device Emulation
 
 ## Components and Interfaces
 
@@ -109,7 +109,7 @@ Feature: Ticket Management System
   So that I can track all service requests and their completion status
 
   Background:
-    Given I am logged into the pest control system
+    Given I am authenticated as MVP user "usermvp@hwpc.net"
     And I have access to the ticket management interface
 
   @mobile @crud
@@ -182,61 +182,52 @@ Then('the Google Sheets backend should contain the new ticket data', async funct
 
 ```javascript
 // page-objects/BasePage.js
-const { By, until } = require('selenium-webdriver');
-
 class BasePage {
-  constructor(driver) {
-    this.driver = driver;
+  constructor(page) {
+    this.page = page;
     this.timeout = 10000;
   }
 
   async navigate(url) {
-    await this.driver.get(url);
+    await this.page.goto(url);
   }
 
-  async waitForElement(locator, timeout = this.timeout) {
-    return await this.driver.wait(until.elementLocated(locator), timeout);
+  async waitForElement(selector, timeout = this.timeout) {
+    return await this.page.waitForSelector(selector, { timeout });
   }
 
-  async clickElement(locator) {
-    const element = await this.waitForElement(locator);
-    await this.driver.wait(until.elementIsEnabled(element), this.timeout);
-    await element.click();
+  async clickElement(selector) {
+    await this.page.click(selector);
   }
 
-  async enterText(locator, text) {
-    const element = await this.waitForElement(locator);
-    await element.clear();
-    await element.sendKeys(text);
+  async enterText(selector, text) {
+    await this.page.fill(selector, text);
   }
 
-  async getText(locator) {
-    const element = await this.waitForElement(locator);
-    return await element.getText();
+  async getText(selector) {
+    return await this.page.textContent(selector);
   }
 
   // Handle Google Sites iframe navigation
   async switchToGoogleSitesFrame() {
-    const frames = await this.driver.findElements(By.css('iframe'));
+    const frames = await this.page.frames();
     for (let frame of frames) {
       try {
-        await this.driver.switchTo().frame(frame);
         // Check if this is the correct frame by looking for app-specific elements
-        const appElements = await this.driver.findElements(By.css('[data-app="pest-control"]'));
+        const appElements = await frame.$$('[data-app="pest-control"]');
         if (appElements.length > 0) {
+          this.page = frame;
           return true;
         }
-        await this.driver.switchTo().defaultContent();
       } catch (e) {
-        await this.driver.switchTo().defaultContent();
+        // Continue to next frame
       }
     }
     return false;
   }
 
   async takeScreenshot(filename) {
-    const screenshot = await this.driver.takeScreenshot();
-    require('fs').writeFileSync(`screenshots/${filename}`, screenshot, 'base64');
+    await this.page.screenshot({ path: `screenshots/${filename}` });
   }
 }
 
@@ -337,14 +328,72 @@ class TicketPage extends BasePage {
 module.exports = { TicketPage };
 ```
 
-### 4. Test Data Management
+### 4. MVP Mock Authentication System
+
+```javascript
+// support/MockAuthManager.js
+class MockAuthManager {
+  constructor() {
+    this.mockUser = {
+      email: 'usermvp@hwpc.net',
+      name: 'MVP Test User',
+      id: 'mvp-user-001',
+      permissions: ['read', 'write', 'delete'],
+      sessionId: 'mvp-session-' + Date.now()
+    };
+  }
+
+  async authenticateAsMVPUser(page) {
+    // Set mock authentication cookies/localStorage
+    await page.addInitScript(() => {
+      localStorage.setItem('auth_user', JSON.stringify({
+        email: 'usermvp@hwpc.net',
+        name: 'MVP Test User',
+        id: 'mvp-user-001',
+        authenticated: true,
+        sessionId: 'mvp-session-' + Date.now()
+      }));
+      
+      // Set session cookie
+      document.cookie = 'mvp_session=authenticated; path=/';
+    });
+  }
+
+  async setMockUserContext(page) {
+    // Inject mock user context into the page
+    await page.evaluate((user) => {
+      window.currentUser = user;
+      window.isAuthenticated = true;
+    }, this.mockUser);
+  }
+
+  getMockUser() {
+    return this.mockUser;
+  }
+
+  async clearMockAuth(page) {
+    await page.evaluate(() => {
+      localStorage.removeItem('auth_user');
+      document.cookie = 'mvp_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      delete window.currentUser;
+      window.isAuthenticated = false;
+    });
+  }
+}
+
+module.exports = { MockAuthManager };
+```
+
+### 5. Test Data Management
 
 ```javascript
 // support/TestDataFactory.js
 const { GoogleSheetsAPI } = require('./GoogleSheetsAPI');
+const { MockAuthManager } = require('./MockAuthManager');
 
 class TestDataFactory {
   static async createTestCustomer(customerData = {}) {
+    const mockAuth = new MockAuthManager();
     const defaultCustomer = {
       companyName: 'Test Company ' + Date.now(),
       contactName: 'Test Contact',
@@ -356,7 +405,9 @@ class TestDataFactory {
       email: 'test@example.com',
       serviceType: 'Monthly Treatment',
       specialInstructions: 'Test customer - safe to delete',
-      active: true
+      active: true,
+      createdBy: mockAuth.getMockUser().email,
+      mvpTestData: true
     };
 
     const customer = { ...defaultCustomer, ...customerData };
@@ -367,6 +418,7 @@ class TestDataFactory {
   static async createTestTicket(ticketData = {}) {
     const customer = await this.createTestCustomer();
     
+    const mockAuth = new MockAuthManager();
     const defaultTicket = {
       customerId: customer.customerId,
       serviceType: 'Monthly Treatment',
@@ -375,7 +427,9 @@ class TestDataFactory {
       priority: 'Medium',
       status: 'Pending',
       serviceNotes: 'Test ticket - safe to delete',
-      estimatedDuration: 60
+      estimatedDuration: 60,
+      createdBy: mockAuth.getMockUser().email,
+      mvpTestData: true
     };
 
     const ticket = { ...defaultTicket, ...ticketData };
@@ -398,63 +452,57 @@ class TestDataFactory {
 module.exports = { TestDataFactory };
 ```
 
-### 5. Chrome WebDriver Configuration
+### 6. Playwright Browser Configuration
 
 ```javascript
-// support/WebDriverManager.js
-const { Builder, Capabilities } = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
+// support/BrowserManager.js
+const { chromium, firefox, webkit } = require('playwright');
 
-class WebDriverManager {
-  static createDriver(options = {}) {
-    const chromeOptions = new chrome.Options();
+class BrowserManager {
+  static async createBrowser(options = {}) {
+    const browserType = options.browser || 'chromium';
     
-    // Default Chrome options
-    chromeOptions.addArguments('--no-sandbox');
-    chromeOptions.addArguments('--disable-dev-shm-usage');
-    chromeOptions.addArguments('--disable-gpu');
-    chromeOptions.addArguments('--window-size=1920,1080');
-    
-    // Headless mode for CI
-    if (process.env.HEADLESS === 'true' || process.env.CI === 'true') {
-      chromeOptions.addArguments('--headless');
+    const launchOptions = {
+      headless: process.env.HEADLESS === 'true' || process.env.CI === 'true',
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+      ]
+    };
+
+    let browser;
+    switch (browserType) {
+      case 'firefox':
+        browser = await firefox.launch(launchOptions);
+        break;
+      case 'webkit':
+        browser = await webkit.launch(launchOptions);
+        break;
+      default:
+        browser = await chromium.launch(launchOptions);
     }
 
-    // Mobile device emulation
-    if (options.mobileDevice) {
-      const mobileEmulation = {
-        deviceName: options.mobileDevice
-      };
-      chromeOptions.setMobileEmulation(mobileEmulation);
-    }
+    const context = await browser.newContext({
+      viewport: options.viewport || { width: 1920, height: 1080 },
+      // Mobile device emulation
+      ...(options.mobileDevice && { 
+        ...require('playwright').devices[options.mobileDevice] 
+      })
+    });
 
-    // Custom screen size
-    if (options.screenSize) {
-      chromeOptions.addArguments(`--window-size=${options.screenSize}`);
-    }
-
-    // Performance optimization
-    chromeOptions.addArguments('--disable-extensions');
-    chromeOptions.addArguments('--disable-plugins');
-    chromeOptions.addArguments('--disable-images');
-
-    const capabilities = Capabilities.chrome();
-    capabilities.set('chromeOptions', chromeOptions);
-
-    return new Builder()
-      .forBrowser('chrome')
-      .withCapabilities(capabilities)
-      .build();
+    const page = await context.newPage();
+    return { browser, context, page };
   }
 
-  static async quitDriver(driver) {
-    if (driver) {
-      await driver.quit();
+  static async closeBrowser(browser) {
+    if (browser) {
+      await browser.close();
     }
   }
 }
 
-module.exports = { WebDriverManager };
+module.exports = { BrowserManager };
 ```
 
 ## Data Models
@@ -507,13 +555,15 @@ module.exports = {
 ### Google Sheets Test Data Schema
 
 ```javascript
-// Test data will mirror production schema but with test prefixes
+// Test data will mirror production schema but with test prefixes and MVP user identification
 const TEST_CUSTOMER_SCHEMA = {
   customerId: 'TEST_CUST_' + timestamp,
   companyName: 'TEST_' + companyName,
   // ... other fields
   testFlag: true,
-  createdByTest: true
+  createdByTest: true,
+  createdBy: 'usermvp@hwpc.net',
+  mvpTestData: true
 };
 
 const TEST_TICKET_SCHEMA = {
@@ -521,7 +571,9 @@ const TEST_TICKET_SCHEMA = {
   customerId: 'TEST_CUST_' + customerId,
   // ... other fields
   testFlag: true,
-  createdByTest: true
+  createdByTest: true,
+  createdBy: 'usermvp@hwpc.net',
+  mvpTestData: true
 };
 ```
 
@@ -529,7 +581,7 @@ const TEST_TICKET_SCHEMA = {
 
 ### Test Execution Error Handling
 
-1. **WebDriver Errors**
+1. **Playwright Browser Errors**
    - Element not found: Retry with exponential backoff
    - Timeout errors: Capture screenshot and page source
    - Browser crashes: Restart browser and retry test
@@ -549,22 +601,20 @@ const TEST_TICKET_SCHEMA = {
 ```javascript
 // support/ErrorHandler.js
 class ErrorHandler {
-  static async handleTestFailure(scenario, driver) {
+  static async handleTestFailure(scenario, page) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const screenshotName = `failure-${scenario.pickle.name}-${timestamp}.png`;
     
     try {
       // Capture screenshot
-      await driver.takeScreenshot().then(screenshot => {
-        require('fs').writeFileSync(`screenshots/${screenshotName}`, screenshot, 'base64');
-      });
+      await page.screenshot({ path: `screenshots/${screenshotName}` });
 
       // Capture page source
-      const pageSource = await driver.getPageSource();
+      const pageSource = await page.content();
       require('fs').writeFileSync(`logs/page-source-${timestamp}.html`, pageSource);
 
-      // Capture console logs
-      const logs = await driver.manage().logs().get('browser');
+      // Capture console logs (collected during test execution)
+      const logs = this.consoleLogs || [];
       require('fs').writeFileSync(`logs/console-${timestamp}.json`, JSON.stringify(logs, null, 2));
 
     } catch (captureError) {
@@ -592,7 +642,7 @@ module.exports = { ErrorHandler };
 ### Test Execution Levels
 
 1. **Smoke Tests** (Critical Path)
-   - User authentication
+   - MVP mock authentication
    - Basic CRUD operations
    - Google Sheets connectivity
 
