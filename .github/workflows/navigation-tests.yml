@@ -1,0 +1,175 @@
+name: Navigation Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run navigation tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  navigation-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        viewport: [mobile, tablet, desktop]
+        
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Type check
+      run: npm run type-check
+      
+    - name: Run navigation tests
+      env:
+        BROWSER: ${{ matrix.browser }}
+        VIEWPORT_CATEGORY: ${{ matrix.viewport }}
+        TEST_TIMEOUT: 10
+        PARALLEL_THREAD: 1
+        RETRIES: 2
+        RECORD_VIDEO: true
+        BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:3000' }}
+        ENVIRONMENT: ci
+      run: npm run test:navigation
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: navigation-test-results-${{ matrix.browser }}-${{ matrix.viewport }}
+        path: |
+          test-results/
+          !test-results/node_modules
+        retention-days: 7
+        
+    - name: Upload screenshots on failure
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: navigation-screenshots-${{ matrix.browser }}-${{ matrix.viewport }}
+        path: test-results/screenshots/
+        retention-days: 14
+        
+    - name: Upload videos on failure
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: navigation-videos-${{ matrix.browser }}-${{ matrix.viewport }}
+        path: test-results/videos/
+        retention-days: 14
+
+  navigation-mobile-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Run mobile navigation tests
+      env:
+        BROWSER: chromium
+        TEST_TIMEOUT: 15
+        PARALLEL_THREAD: 1
+        RETRIES: 3
+        RECORD_VIDEO: true
+        BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:3000' }}
+        ENVIRONMENT: ci
+      run: npm run test:navigation:mobile
+      
+    - name: Upload mobile test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: navigation-mobile-test-results
+        path: |
+          test-results/
+          !test-results/node_modules
+        retention-days: 7
+
+  navigation-performance-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Run navigation performance tests
+      env:
+        BROWSER: chromium
+        TEST_TIMEOUT: 20
+        PARALLEL_THREAD: 1
+        RETRIES: 1
+        RECORD_VIDEO: false
+        BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:3000' }}
+        ENVIRONMENT: ci
+      run: npm run test:navigation:performance
+      
+    - name: Upload performance test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: navigation-performance-test-results
+        path: |
+          test-results/
+          !test-results/node_modules
+        retention-days: 7
+
+  publish-results:
+    runs-on: ubuntu-latest
+    needs: [navigation-tests, navigation-mobile-tests, navigation-performance-tests]
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download all test results
+      uses: actions/download-artifact@v3
+      with:
+        path: all-test-results/
+        
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Navigation Test Results
+        path: 'all-test-results/**/cucumber.json'
+        reporter: java-junit
+        fail-on-error: false

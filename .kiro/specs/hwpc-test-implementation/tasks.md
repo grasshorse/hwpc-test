@@ -118,7 +118,7 @@
 
 
 
-- [ ] 4.2 Create HWPC API constants and endpoints
+- [x] 4.2 Create HWPC API constants and endpoints
 
 
 
@@ -130,7 +130,7 @@
 
   - _Requirements: 3.2_
 
-- [ ] 4.3 Implement HWPC API step definitions
+- [x] 4.3 Implement HWPC API step definitions
   - Create HWPCAPISteps.ts following existing REST step patterns
   - Add step definitions for HWPC API endpoints
   - Include API response validation and error handling steps

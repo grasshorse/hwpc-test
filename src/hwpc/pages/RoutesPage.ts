@@ -479,8 +479,8 @@ export default class RoutesPage extends NavigationPage {
      */
     private async applyDriverFilter(driver: string): Promise<void> {
         try {
-            const driverFilter = this.web.dropDown(this.ROUTE_DRIVER_FILTER, "Driver Filter");
-            const isFilterVisible = await driverFilter.isVisible(2);
+            const driverFilter = this.web.dropdown(this.ROUTE_DRIVER_FILTER, "Driver Filter");
+            const isFilterVisible = await this.web.element(this.ROUTE_DRIVER_FILTER, "Driver Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await driverFilter.selectByVisibleText(driver);
@@ -497,8 +497,8 @@ export default class RoutesPage extends NavigationPage {
      */
     private async applyStatusFilter(status: string): Promise<void> {
         try {
-            const statusFilter = this.web.dropDown(this.ROUTE_STATUS_FILTER, "Status Filter");
-            const isFilterVisible = await statusFilter.isVisible(2);
+            const statusFilter = this.web.dropdown(this.ROUTE_STATUS_FILTER, "Status Filter");
+            const isFilterVisible = await this.web.element(this.ROUTE_STATUS_FILTER, "Status Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await statusFilter.selectByVisibleText(status);

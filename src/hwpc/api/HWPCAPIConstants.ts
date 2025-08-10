@@ -225,8 +225,54 @@ export default class HWPCAPIConstants {
     // ===== REQUEST TIMEOUT =====
     static readonly DEFAULT_TIMEOUT = 30000; // 30 seconds
     static readonly LONG_TIMEOUT = 60000; // 60 seconds
+    static readonly SHORT_TIMEOUT = 10000; // 10 seconds
     
     // ===== FILE UPLOAD =====
     static readonly MAX_FILE_SIZE = 10485760; // 10MB
     static readonly ALLOWED_FILE_TYPES = ["jpg", "jpeg", "png", "gif", "pdf", "doc", "docx", "txt"];
+    
+    // ===== API RESPONSE VALIDATION =====
+    static readonly RESPONSE_TIME_THRESHOLD = 2000; // 2 seconds
+    static readonly MAX_RESPONSE_SIZE = 52428800; // 50MB
+    
+    // ===== ADDITIONAL JSON PATH CONSTANTS FOR COMPLEX RESPONSES =====
+    
+    // Nested Object Paths
+    static readonly TICKET_CUSTOMER_ID_JSON_PATH = "$.data.customer.id";
+    static readonly TICKET_CUSTOMER_NAME_JSON_PATH = "$.data.customer.name";
+    static readonly TICKET_ASSIGNEE_ID_JSON_PATH = "$.data.assignee.id";
+    static readonly TICKET_ASSIGNEE_NAME_JSON_PATH = "$.data.assignee.name";
+    
+    // Array Length and Existence Checks
+    static readonly DATA_ARRAY_LENGTH_JSON_PATH = "$.data.length";
+    static readonly HAS_DATA_JSON_PATH = "$.data";
+    static readonly IS_EMPTY_RESPONSE_JSON_PATH = "$.data[*]";
+    
+    // Metadata Paths
+    static readonly RESPONSE_TIMESTAMP_JSON_PATH = "$.timestamp";
+    static readonly RESPONSE_VERSION_JSON_PATH = "$.version";
+    static readonly RESPONSE_REQUEST_ID_JSON_PATH = "$.requestId";
+    
+    // ===== API ERROR RESPONSE PATTERNS =====
+    static readonly VALIDATION_ERROR_FIELD_JSON_PATH = "$.error.validationErrors[*].field";
+    static readonly VALIDATION_ERROR_MESSAGE_JSON_PATH = "$.error.validationErrors[*].message";
+    static readonly VALIDATION_ERROR_CODE_JSON_PATH = "$.error.validationErrors[*].code";
+    
+    // ===== ADDITIONAL ERROR CODES =====
+    static readonly ERROR_NETWORK_TIMEOUT = "NETWORK_TIMEOUT";
+    static readonly ERROR_SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
+    static readonly ERROR_INVALID_REQUEST_FORMAT = "INVALID_REQUEST_FORMAT";
+    static readonly ERROR_MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD";
+    static readonly ERROR_INVALID_FIELD_VALUE = "INVALID_FIELD_VALUE";
+    static readonly ERROR_RESOURCE_CONFLICT = "RESOURCE_CONFLICT";
+    static readonly ERROR_OPERATION_NOT_ALLOWED = "OPERATION_NOT_ALLOWED";
+    
+    // ===== ADDITIONAL ERROR MESSAGES =====
+    static readonly MSG_NETWORK_TIMEOUT = "Request timed out due to network issues";
+    static readonly MSG_SERVICE_UNAVAILABLE = "Service is temporarily unavailable";
+    static readonly MSG_INVALID_REQUEST_FORMAT = "Request format is invalid or malformed";
+    static readonly MSG_MISSING_REQUIRED_FIELD = "Required field is missing from request";
+    static readonly MSG_INVALID_FIELD_VALUE = "Field value is invalid or out of range";
+    static readonly MSG_RESOURCE_CONFLICT = "Resource conflict detected";
+    static readonly MSG_OPERATION_NOT_ALLOWED = "Operation is not allowed in current state";
 }

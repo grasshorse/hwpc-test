@@ -304,8 +304,8 @@ export default class TicketsPage extends NavigationPage {
      */
     private async applyStatusFilter(status: string): Promise<void> {
         try {
-            const statusFilter = this.web.dropDown(this.TICKET_STATUS_FILTER, "Status Filter");
-            const isFilterVisible = await statusFilter.isVisible(2);
+            const statusFilter = this.web.dropdown(this.TICKET_STATUS_FILTER, "Status Filter");
+            const isFilterVisible = await this.web.element(this.TICKET_STATUS_FILTER, "Status Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await statusFilter.selectByVisibleText(status);
@@ -322,8 +322,8 @@ export default class TicketsPage extends NavigationPage {
      */
     private async applyPriorityFilter(priority: string): Promise<void> {
         try {
-            const priorityFilter = this.web.dropDown(this.TICKET_PRIORITY_FILTER, "Priority Filter");
-            const isFilterVisible = await priorityFilter.isVisible(2);
+            const priorityFilter = this.web.dropdown(this.TICKET_PRIORITY_FILTER, "Priority Filter");
+            const isFilterVisible = await this.web.element(this.TICKET_PRIORITY_FILTER, "Priority Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await priorityFilter.selectByVisibleText(priority);

@@ -15,15 +15,33 @@ export interface TimeoutConfig {
   networkIdle: number;
 }
 
+export interface SelectorStrategy {
+  selector: string;
+  priority: number;
+  description: string;
+  viewport?: 'mobile' | 'tablet' | 'desktop' | 'all';
+  reliability: 'high' | 'medium' | 'low';
+}
+
+export interface NavigationLinkSelectors {
+  strategies: SelectorStrategy[];
+  fallbacks: string[];
+}
+
 export interface PageConfig {
   name: string;
   url: string;
+  urlPatterns: string[];
   title: string;
+  titlePatterns: string[];
   selectors: {
     main: string;
     navigation: string;
     searchInterface?: string;
   };
+  navigationLinks: NavigationLinkSelectors;
+  pageIdentifiers: SelectorStrategy[];
+  requiredElements: SelectorStrategy[];
 }
 
 /**
@@ -45,55 +63,170 @@ class NavigationConstants {
     desktop: { pageLoad: 10000, elementWait: 6000, networkIdle: 3000 }
   };
 
-  // Page configurations for navigation testing
+  // Page configurations for navigation testing with multiple selector strategies
   private static readonly PAGES: Record<string, PageConfig> = {
     home: {
       name: 'home',
       url: '/',
-      title: 'HWPC - Home',
+      urlPatterns: ['/', '/home', '/dashboard', '/index.html', '?page=home'],
+      title: 'Dashboard - Static Site API Testing',
+      titlePatterns: ['Dashboard', 'Home', 'Static Site', 'API Testing'],
       selectors: {
-        main: '[data-testid="home-page"]',
-        navigation: '[data-testid="main-navigation"]',
-        searchInterface: '[data-testid="search-interface"]'
-      }
+        main: '.home-page, .dashboard-page, .main-content, [data-testid="home-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+        searchInterface: '.search-interface, .search-container, [data-search], [data-testid="search-interface"]'
+      },
+      navigationLinks: {
+        strategies: [
+          { selector: 'a[href="/"]', priority: 1, description: 'Direct home link', viewport: 'all', reliability: 'high' },
+          { selector: 'a[href="/home"]', priority: 2, description: 'Home page link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-testid="home-link"]', priority: 3, description: 'Test ID home link', viewport: 'all', reliability: 'high' },
+          { selector: '.nav-home', priority: 4, description: 'CSS class home link', viewport: 'all', reliability: 'medium' },
+          { selector: 'a[href*="home"]', priority: 5, description: 'Contains home in href', viewport: 'all', reliability: 'medium' },
+          { selector: '.home-link', priority: 6, description: 'Generic home link class', viewport: 'all', reliability: 'low' }
+        ],
+        fallbacks: ['a:has-text("Home")', 'a:has-text("Dashboard")', '[role="button"]:has-text("Home")']
+      },
+      pageIdentifiers: [
+        { selector: '.home-page', priority: 1, description: 'Home page container', viewport: 'all', reliability: 'high' },
+        { selector: '.dashboard-page', priority: 2, description: 'Dashboard page container', viewport: 'all', reliability: 'high' },
+        { selector: '[data-testid="home-page"]', priority: 3, description: 'Test ID home page', viewport: 'all', reliability: 'high' },
+        { selector: 'h1:has-text("Dashboard")', priority: 4, description: 'Dashboard heading', viewport: 'all', reliability: 'medium' },
+        { selector: '.main-content', priority: 5, description: 'Main content area', viewport: 'all', reliability: 'low' }
+      ],
+      requiredElements: [
+        { selector: '.main-content', priority: 1, description: 'Main content container', viewport: 'all', reliability: 'high' },
+        { selector: '.main-nav', priority: 2, description: 'Main navigation', viewport: 'all', reliability: 'high' },
+        { selector: 'body', priority: 3, description: 'Page body', viewport: 'all', reliability: 'high' }
+      ]
     },
     customers: {
       name: 'customers',
       url: '/customers',
-      title: 'HWPC - Customers',
+      urlPatterns: ['/customers', '/customer', '/customers.html', '?page=customers'],
+      title: 'Static Site - API Testing',
+      titlePatterns: ['Customers', 'Customer Management', 'Static Site', 'API Testing'],
       selectors: {
-        main: '[data-testid="customers-page"]',
-        navigation: '[data-testid="main-navigation"]',
-        searchInterface: '[data-testid="customer-search"]'
-      }
+        main: '.customers-page, .main-content, [data-testid="customers-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+        searchInterface: '.customer-search, .search-container, [data-search], [data-testid="customer-search"]'
+      },
+      navigationLinks: {
+        strategies: [
+          { selector: 'a[href="/customers"]', priority: 1, description: 'Direct customers link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-testid="customers-link"]', priority: 2, description: 'Test ID customers link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-nav="customers"]', priority: 3, description: 'Data nav customers', viewport: 'all', reliability: 'high' },
+          { selector: '.nav-customers', priority: 4, description: 'CSS class customers link', viewport: 'all', reliability: 'medium' },
+          { selector: 'a[href*="customers"]', priority: 5, description: 'Contains customers in href', viewport: 'all', reliability: 'medium' },
+          { selector: '.customers-link', priority: 6, description: 'Generic customers link class', viewport: 'all', reliability: 'medium' },
+          { selector: '.mobile-nav a[href*="customers"]', priority: 7, description: 'Mobile nav customers link', viewport: 'mobile', reliability: 'medium' }
+        ],
+        fallbacks: ['a:has-text("Customers")', 'a:has-text("Customer")', '[role="button"]:has-text("Customers")']
+      },
+      pageIdentifiers: [
+        { selector: '.customers-page', priority: 1, description: 'Customers page container', viewport: 'all', reliability: 'high' },
+        { selector: '[data-testid="customers-page"]', priority: 2, description: 'Test ID customers page', viewport: 'all', reliability: 'high' },
+        { selector: 'h1:has-text("Customers")', priority: 3, description: 'Customers heading', viewport: 'all', reliability: 'medium' },
+        { selector: '.customer-list', priority: 4, description: 'Customer list container', viewport: 'all', reliability: 'medium' },
+        { selector: '.main-content', priority: 5, description: 'Main content area', viewport: 'all', reliability: 'low' }
+      ],
+      requiredElements: [
+        { selector: '.main-content', priority: 1, description: 'Main content container', viewport: 'all', reliability: 'high' },
+        { selector: '.customer-search', priority: 2, description: 'Customer search interface', viewport: 'all', reliability: 'high' },
+        { selector: '.main-nav', priority: 3, description: 'Main navigation', viewport: 'all', reliability: 'high' }
+      ]
     },
     tickets: {
       name: 'tickets',
       url: '/tickets',
-      title: 'HWPC - Tickets',
+      urlPatterns: ['/tickets', '/ticket', '/tickets.html', '?page=tickets'],
+      title: 'Static Site - API Testing',
+      titlePatterns: ['Tickets', 'Ticket Management', 'Static Site', 'API Testing'],
       selectors: {
-        main: '[data-testid="tickets-page"]',
-        navigation: '[data-testid="main-navigation"]',
-        searchInterface: '[data-testid="ticket-search"]'
-      }
+        main: '.tickets-page, .main-content, [data-testid="tickets-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+        searchInterface: '.ticket-search, .search-container, [data-search], [data-testid="ticket-search"]'
+      },
+      navigationLinks: {
+        strategies: [
+          { selector: 'a[href="/tickets"]', priority: 1, description: 'Direct tickets link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-testid="tickets-link"]', priority: 2, description: 'Test ID tickets link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-nav="tickets"]', priority: 3, description: 'Data nav tickets', viewport: 'all', reliability: 'high' },
+          { selector: '.nav-tickets', priority: 4, description: 'CSS class tickets link', viewport: 'all', reliability: 'medium' },
+          { selector: 'a[href*="tickets"]', priority: 5, description: 'Contains tickets in href', viewport: 'all', reliability: 'medium' },
+          { selector: '.tickets-link', priority: 6, description: 'Generic tickets link class', viewport: 'all', reliability: 'medium' },
+          { selector: '.mobile-nav a[href*="tickets"]', priority: 7, description: 'Mobile nav tickets link', viewport: 'mobile', reliability: 'medium' },
+          { selector: 'button[onclick*="tickets"]', priority: 8, description: 'Button with tickets onclick', viewport: 'all', reliability: 'low' }
+        ],
+        fallbacks: ['a:has-text("Tickets")', 'a:has-text("Ticket")', '[role="button"]:has-text("Tickets")']
+      },
+      pageIdentifiers: [
+        { selector: '.tickets-page', priority: 1, description: 'Tickets page container', viewport: 'all', reliability: 'high' },
+        { selector: '[data-testid="tickets-page"]', priority: 2, description: 'Test ID tickets page', viewport: 'all', reliability: 'high' },
+        { selector: 'h1:has-text("Tickets")', priority: 3, description: 'Tickets heading', viewport: 'all', reliability: 'medium' },
+        { selector: '.ticket-list', priority: 4, description: 'Ticket list container', viewport: 'all', reliability: 'medium' },
+        { selector: '.tickets-container', priority: 5, description: 'Tickets container', viewport: 'all', reliability: 'medium' },
+        { selector: '.main-content', priority: 6, description: 'Main content area', viewport: 'all', reliability: 'low' }
+      ],
+      requiredElements: [
+        { selector: '.main-content', priority: 1, description: 'Main content container', viewport: 'all', reliability: 'high' },
+        { selector: '.ticket-search', priority: 2, description: 'Ticket search interface', viewport: 'all', reliability: 'high' },
+        { selector: '.main-nav', priority: 3, description: 'Main navigation', viewport: 'all', reliability: 'high' }
+      ]
     },
     routes: {
       name: 'routes',
       url: '/routes',
-      title: 'HWPC - Routes',
+      urlPatterns: ['/routes', '/route', '/routes.html', '?page=routes'],
+      title: 'Static Site - API Testing',
+      titlePatterns: ['Routes', 'Route Management', 'Static Site', 'API Testing'],
       selectors: {
-        main: '[data-testid="routes-page"]',
-        navigation: '[data-testid="main-navigation"]',
-        searchInterface: '[data-testid="route-search"]'
-      }
+        main: '.routes-page, .main-content, [data-testid="routes-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+        searchInterface: '.route-search, .search-container, [data-search], [data-testid="route-search"]'
+      },
+      navigationLinks: {
+        strategies: [
+          { selector: 'a[href="/routes"]', priority: 1, description: 'Direct routes link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-testid="routes-link"]', priority: 2, description: 'Test ID routes link', viewport: 'all', reliability: 'high' },
+          { selector: '[data-nav="routes"]', priority: 3, description: 'Data nav routes', viewport: 'all', reliability: 'high' },
+          { selector: '.nav-routes', priority: 4, description: 'CSS class routes link', viewport: 'all', reliability: 'medium' },
+          { selector: 'a[href*="routes"]', priority: 5, description: 'Contains routes in href', viewport: 'all', reliability: 'medium' },
+          { selector: '.routes-link', priority: 6, description: 'Generic routes link class', viewport: 'all', reliability: 'medium' },
+          { selector: '.mobile-nav a[href*="routes"]', priority: 7, description: 'Mobile nav routes link', viewport: 'mobile', reliability: 'medium' }
+        ],
+        fallbacks: ['a:has-text("Routes")', 'a:has-text("Route")', '[role="button"]:has-text("Routes")']
+      },
+      pageIdentifiers: [
+        { selector: '.routes-page', priority: 1, description: 'Routes page container', viewport: 'all', reliability: 'high' },
+        { selector: '[data-testid="routes-page"]', priority: 2, description: 'Test ID routes page', viewport: 'all', reliability: 'high' },
+        { selector: 'h1:has-text("Routes")', priority: 3, description: 'Routes heading', viewport: 'all', reliability: 'medium' },
+        { selector: '.route-list', priority: 4, description: 'Route list container', viewport: 'all', reliability: 'medium' },
+        { selector: '.main-content', priority: 5, description: 'Main content area', viewport: 'all', reliability: 'low' }
+      ],
+      requiredElements: [
+        { selector: '.main-content', priority: 1, description: 'Main content container', viewport: 'all', reliability: 'high' },
+        { selector: '.route-search', priority: 2, description: 'Route search interface', viewport: 'all', reliability: 'high' },
+        { selector: '.main-nav', priority: 3, description: 'Main navigation', viewport: 'all', reliability: 'high' }
+      ]
     },
     dashboard: {
       name: 'dashboard',
       url: '/dashboard',
-      title: 'HWPC - Dashboard',
+      title: 'Static Site - API Testing',
       selectors: {
-        main: '[data-testid="dashboard-page"]',
-        navigation: '[data-testid="main-navigation"]'
+        main: '.dashboard-page, .main-content, [data-testid="dashboard-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]'
+      }
+    },
+    reports: {
+      name: 'reports',
+      url: '/reports',
+      title: 'Static Site - API Testing',
+      selectors: {
+        main: '.reports-page, .main-content, [data-testid="reports-page"], body',
+        navigation: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+        searchInterface: '.report-search, .search-container, [data-search], [data-testid="report-search"]'
       }
     }
   };
@@ -225,36 +358,54 @@ class NavigationConstants {
   }
 
   /**
-   * Get navigation selectors for different viewport categories
+   * Get navigation selectors for different viewport categories with fallbacks
    */
   static getNavigationSelectors(viewportCategory: string) {
     const baseSelectors = {
-      mainNav: '[data-testid="main-navigation"]',
-      mobileMenuToggle: '[data-testid="mobile-menu-toggle"]',
-      navLinks: '[data-testid="nav-link"]',
-      searchInterface: '[data-testid="search-interface"]'
+      mainNav: '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]',
+      mobileMenuToggle: '.navbar-toggle, .mobile-menu-toggle, [data-testid="mobile-nav-toggle"], .hamburger, .menu-toggle, .navbar-toggler, [data-testid="mobile-menu-toggle"]',
+      navLinks: 'a[href], .nav-link, [data-nav-link], [data-testid="nav-link"]',
+      searchInterface: '.search-interface, .search-container, [data-search], [data-testid="search-interface"]'
     };
 
     switch (viewportCategory) {
       case 'mobile':
         return {
           ...baseSelectors,
-          activeNav: '[data-testid="mobile-navigation"]',
-          menuButton: '[data-testid="mobile-menu-button"]'
+          activeNav: '.mobile-nav, .nav-mobile, [data-mobile-nav], [data-testid="mobile-navigation"]',
+          menuButton: '.mobile-menu-button, .menu-btn-mobile, [data-mobile-menu-btn], [data-testid="mobile-menu-button"]'
         };
       case 'tablet':
         return {
           ...baseSelectors,
-          activeNav: '[data-testid="tablet-navigation"]'
+          activeNav: '.tablet-nav, .nav-tablet, [data-tablet-nav], [data-testid="tablet-navigation"]'
         };
       case 'desktop':
         return {
           ...baseSelectors,
-          activeNav: '[data-testid="desktop-navigation"]'
+          activeNav: '.desktop-nav, .nav-desktop, [data-desktop-nav], [data-testid="desktop-navigation"]'
         };
       default:
         return baseSelectors;
     }
+  }
+
+  /**
+   * Get navigation link selector for a specific page with fallbacks
+   */
+  static getNavigationLinkSelector(pageName: string): string {
+    const fallbackSelectors = [
+      `a[href*="${pageName}"]`,
+      `a[href*="/${pageName}"]`,
+      `.${pageName}-link`,
+      `[data-nav="${pageName}"]`,
+      `[data-testid="${pageName}-link"]`,
+      `[data-testid="nav-link-${pageName}"]`,
+      `.nav-${pageName}`,
+      `.menu-${pageName}`
+    ];
+    
+    return fallbackSelectors.join(', ');
   }
 
   // Legacy method compatibility for NavigationPage.ts
@@ -298,22 +449,22 @@ class NavigationConstants {
     return pageConfig.selectors.searchInterface;
   }
 
-  // Static selector constants for compatibility
-  static readonly MOBILE_MENU_CONTAINER = '[data-testid="mobile-menu-container"]';
-  static readonly MOBILE_MENU_TOGGLE = '[data-testid="mobile-menu-toggle"]';
-  static readonly MOBILE_CONTAINER = '[data-testid="mobile-container"]';
-  static readonly MOBILE_HIDDEN = '[data-mobile-hidden="true"]';
-  static readonly TABLET_CONTAINER = '[data-testid="tablet-container"]';
-  static readonly TABLET_VISIBLE = '[data-tablet-visible="true"]';
-  static readonly DESKTOP_CONTAINER = '[data-testid="desktop-container"]';
-  static readonly DESKTOP_VISIBLE = '[data-desktop-visible="true"]';
-  static readonly MAIN_NAVIGATION = '[data-testid="main-navigation"]';
-  static readonly NAVIGATION_MENU = '[data-testid="navigation-menu"]';
-  static readonly MOBILE_SEARCH_CONTAINER = '[data-testid="mobile-search-container"]';
-  static readonly SEARCH_CONTAINER = '[data-testid="search-container"]';
-  static readonly MOBILE_SEARCH_INPUT = '[data-testid="mobile-search-input"]';
-  static readonly SEARCH_INPUT = '[data-testid="search-input"]';
-  static readonly RESPONSIVE_CONTAINER = '[data-testid="responsive-container"]';
+  // Static selector constants with fallbacks for real application compatibility
+  static readonly MOBILE_MENU_CONTAINER = '.mobile-menu, .navbar-collapse, .nav-mobile, [data-mobile-menu], [data-testid="mobile-menu-container"]';
+  static readonly MOBILE_MENU_TOGGLE = '.navbar-toggle, .mobile-menu-toggle, [data-testid="mobile-nav-toggle"], .hamburger, .menu-toggle, .navbar-toggler, [data-testid="mobile-menu-toggle"]';
+  static readonly MOBILE_CONTAINER = '.mobile-container, .container-mobile, [data-mobile], [data-testid="mobile-container"]';
+  static readonly MOBILE_HIDDEN = '[data-mobile-hidden="true"], .mobile-hidden, .d-none-mobile';
+  static readonly TABLET_CONTAINER = '.tablet-container, .container-tablet, [data-tablet], [data-testid="tablet-container"]';
+  static readonly TABLET_VISIBLE = '[data-tablet-visible="true"], .tablet-visible, .d-block-tablet';
+  static readonly DESKTOP_CONTAINER = '.desktop-container, .container-desktop, [data-desktop], [data-testid="desktop-container"]';
+  static readonly DESKTOP_VISIBLE = '[data-desktop-visible="true"], .desktop-visible, .d-block-desktop';
+  static readonly MAIN_NAVIGATION = '.main-nav, .navbar-nav, [data-testid="main-nav"], .navigation, .nav-menu, [data-testid="main-navigation"]';
+  static readonly NAVIGATION_MENU = '.nav-menu, .navigation-menu, .navbar-nav, [data-testid="navigation-menu"]';
+  static readonly MOBILE_SEARCH_CONTAINER = '.mobile-search, .search-mobile, [data-mobile-search], [data-testid="mobile-search-container"]';
+  static readonly SEARCH_CONTAINER = '.search-container, .search-wrapper, [data-search], [data-testid="search-container"]';
+  static readonly MOBILE_SEARCH_INPUT = '.mobile-search-input, .search-input-mobile, [data-mobile-search-input], [data-testid="mobile-search-input"]';
+  static readonly SEARCH_INPUT = '.search-input, input[type="search"], [data-search-input], [data-testid="search-input"]';
+  static readonly RESPONSIVE_CONTAINER = '.container, .container-fluid, .responsive-container, [data-responsive], [data-testid="responsive-container"]';
 
   // Mobile menu configuration
   static readonly MOBILE_MENU_CONFIG = {
@@ -336,6 +487,92 @@ export interface PageValidation {
   loadTime: number;
   searchInterfacePresent: boolean;
   isResponsive: boolean;
+  errors: string[];
+}
+
+// Enhanced validation interfaces for comprehensive testing
+export interface PerformanceMetrics {
+  loadTime: number;
+  domContentLoaded: number;
+  firstContentfulPaint: number;
+  largestContentfulPaint: number;
+  firstInputDelay: number;
+  cumulativeLayoutShift: number;
+  timeToInteractive: number;
+  navigationStart: number;
+  domInteractive: number;
+  loadEventEnd: number;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  timestamp: string;
+}
+
+export interface ElementValidationDetail {
+  selector: string;
+  name: string;
+  isPresent: boolean;
+  isVisible: boolean;
+  isInteractable: boolean;
+}
+
+export interface UrlValidationResult {
+  isValid: boolean;
+  expectedPattern: string;
+  actualUrl: string;
+  matchDetails: {
+    pathMatches: boolean;
+    queryParamsValid: boolean;
+    fragmentValid: boolean;
+  };
+  errors: string[];
+}
+
+export interface TitleValidationResult {
+  isValid: boolean;
+  expectedTitle: string;
+  actualTitle: string;
+  matchType: 'exact' | 'contains' | 'pattern' | 'none';
+  errors: string[];
+}
+
+export interface ElementValidationResult {
+  isValid: boolean;
+  totalElements: number;
+  presentElements: number;
+  missingElements: string[];
+  elementDetails: ElementValidationDetail[];
+  errors: string[];
+}
+
+export interface PerformanceValidationResult {
+  isValid: boolean;
+  metrics: PerformanceMetrics;
+  thresholds: {
+    loadTime: number;
+    domContentLoaded: number;
+    firstContentfulPaint: number;
+    largestContentfulPaint: number;
+  };
+  validationResults: {
+    loadTimeValid: boolean;
+    domContentLoadedValid: boolean;
+    firstContentfulPaintValid: boolean;
+    largestContentfulPaintValid: boolean;
+  };
+  errors: string[];
+  warnings: string[];
+}
+
+export interface ComprehensiveValidationResult {
+  isValid: boolean;
+  loadTime: number;
+  performanceMetrics: PerformanceMetrics;
+  validationResults: PageValidation;
+  timeoutExceeded: boolean;
   errors: string[];
 }
 

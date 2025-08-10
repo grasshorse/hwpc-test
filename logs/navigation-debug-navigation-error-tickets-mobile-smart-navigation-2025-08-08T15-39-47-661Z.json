@@ -1,0 +1,37 @@
+{
+  "basic": {
+    "pageName": "tickets",
+    "context": "smart-navigation",
+    "attempt": 0,
+    "viewport": "mobile",
+    "timestamp": "2025-08-08T15:39:48.089Z",
+    "error": "Smart navigation failed for tickets: Navigation error on tickets: Reload and navigate strategy failed: Navigation error on tickets: Navigation to tickets failed: Navigation error on tickets: Desktop navigation failed: Navigation link not found: [data-testid=\"main-navigation\"]"
+  },
+  "page": {
+    "currentUrl": "http://10.147.17.219:3000/",
+    "currentTitle": "Dashboard - Static Site API Testing",
+    "readyState": "complete",
+    "loadState": "unknown",
+    "viewport": null
+  },
+  "network": {
+    "online": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+  },
+  "elements": {
+    "missingElements": [
+      "[data-testid=\"tickets-page\"]",
+      "[data-testid=\"main-navigation\"]",
+      "[data-testid=\"ticket-search\"]"
+    ],
+    "presentElements": []
+  },
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "performance": {
+    "loadTime": 0.10000002384185791,
+    "domContentLoaded": 2
+  }
+}

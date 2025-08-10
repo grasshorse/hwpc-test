@@ -6,10 +6,20 @@
   "scripts": {
     "test": "npx cucumber-js -p runner & npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
     "test:tags": "npx cucumber-js -p runner --tags",
+    "test:navigation": "npx cucumber-js -p runner --tags @navigation & npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
+    "test:navigation:mobile": "npx cucumber-js -p runner --tags \"@navigation and @mobile\" & npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
+    "test:navigation:responsive": "npx cucumber-js -p runner --tags \"@navigation and @responsive\" & npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
+    "test:navigation:performance": "npx cucumber-js -p runner --tags \"@navigation and @performance\" & npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
     "failed:test": "npx cucumber-js -p rerun",
     "report": "npx ts-node ./src/support/reporter/HTMLReporter.ts & npx ts-node ./src/support/reporter/CucumberReporter.ts",
-    "qa:test": "cross-env TEST_ENV=qa npx cucumber-js -p runner & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/HTMLReporter.ts & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/CucumberReporter.ts",    
-    "dry:test": "npx cucumber-js -p runner --dry-run"
+    "qa:test": "cross-env TEST_ENV=qa npx cucumber-js -p runner & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/HTMLReporter.ts & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/CucumberReporter.ts",
+    "qa:test:navigation": "cross-env TEST_ENV=qa npx cucumber-js -p runner --tags @navigation & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/HTMLReporter.ts & cross-env TEST_ENV=qa npx ts-node ./src/support/reporter/CucumberReporter.ts",
+    "dry:test": "npx cucumber-js -p runner --dry-run",
+    "dry:test:navigation": "npx cucumber-js -p runner --tags @navigation --dry-run",
+    "validate:navigation": "node scripts/validate-navigation-integration.js",
+    "check-imports": "node scripts/check-imports.js",
+    "type-check": "npx tsc --noEmit",
+    "pre-commit": "node scripts/pre-commit-check.js"
   },
   "keywords": [],
   "author": "Vinay Kumar B M",

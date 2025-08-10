@@ -38,38 +38,38 @@
     - _Requirements: 4.6, 10.1, 10.2, 10.3_
 
 - [ ] 4. Create feature files from existing pest control requirements
-  - [ ] 4.1 Convert customer management requirements to Gherkin features
+  - [x] 4.1 Convert customer management requirements to Gherkin features
     - Write customer-management.feature with scenarios for CRUD operations
     - Include mobile-specific scenarios for touch interactions
     - Add data validation and Google Sheets integration scenarios
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 4.2 Convert ticket management requirements to Gherkin features
+  - [x] 4.2 Convert ticket management requirements to Gherkin features
     - Write ticket-management.feature with comprehensive CRUD scenarios
     - Include mobile responsive testing scenarios
     - Add Google Sheets backend verification scenarios
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 4.3 Convert route planning and printing requirements to features
+  - [-] 4.3 Convert route planning and printing requirements to features
     - Write route-planning.feature and route-printing.feature files
     - Include mobile printing and export functionality scenarios
     - Add scenarios for the legacy print preview layout validation
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 5. Implement page objects for pest control system components
-  - [ ] 5.1 Create DashboardPage and navigation page objects
+- [-] 5. Implement page objects for pest control system components
+  - [x] 5.1 Create DashboardPage and navigation page objects
     - Write DashboardPage.js with navigation and menu interactions
     - Implement page load verification and responsive layout checks
     - Add mobile navigation and touch interaction methods
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 5.2 Create TicketPage object with CRUD operations
+  - [x] 5.2 Create TicketPage object with CRUD operations
     - Write TicketPage.js with ticket creation, editing, and deletion methods
     - Implement form interactions and validation checking
     - Add mobile-specific touch interactions and responsive element handling
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ] 5.3 Create CustomerPage and RoutePage objects
+  - [-] 5.3 Create CustomerPage and RoutePage objects
     - Write CustomerPage.js with customer management functionality
     - Write RoutePage.js with route planning and organization methods
     - Implement drag-and-drop interactions for route assignment
@@ -82,13 +82,13 @@
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 6. Implement step definitions library
-  - [ ] 6.1 Create common step definitions for navigation and mock authentication
+  - [x] 6.1 Create common step definitions for navigation and mock authentication
     - Write mock-auth-steps.js for MVP user authentication simulation
     - Write navigation-steps.js for page navigation and menu interactions
     - Implement error handling and retry logic for flaky steps
     - _Requirements: 5.1, 5.2, 5.5, 10.1, 10.2_
 
-  - [ ] 6.2 Create CRUD operation step definitions
+  - [-] 6.2 Create CRUD operation step definitions
     - Write customer-steps.js for customer management operations
     - Write ticket-steps.js for ticket CRUD and status management
     - Write route-steps.js for route planning and assignment operations

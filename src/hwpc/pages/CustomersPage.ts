@@ -442,8 +442,8 @@ export default class CustomersPage extends NavigationPage {
      */
     private async applyTypeFilter(type: string): Promise<void> {
         try {
-            const typeFilter = this.web.dropDown(this.CUSTOMER_TYPE_FILTER, "Type Filter");
-            const isFilterVisible = await typeFilter.isVisible(2);
+            const typeFilter = this.web.dropdown(this.CUSTOMER_TYPE_FILTER, "Type Filter");
+            const isFilterVisible = await this.web.element(this.CUSTOMER_TYPE_FILTER, "Type Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await typeFilter.selectByVisibleText(type);
@@ -460,8 +460,8 @@ export default class CustomersPage extends NavigationPage {
      */
     private async applyStatusFilter(status: string): Promise<void> {
         try {
-            const statusFilter = this.web.dropDown(this.CUSTOMER_STATUS_FILTER, "Status Filter");
-            const isFilterVisible = await statusFilter.isVisible(2);
+            const statusFilter = this.web.dropdown(this.CUSTOMER_STATUS_FILTER, "Status Filter");
+            const isFilterVisible = await this.web.element(this.CUSTOMER_STATUS_FILTER, "Status Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await statusFilter.selectByVisibleText(status);

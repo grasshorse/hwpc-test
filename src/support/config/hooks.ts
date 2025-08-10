@@ -43,20 +43,66 @@ After(async function ({ result, pickle, gherkinDocument }: ITestCaseHookParamete
     const status = result.status;
     const scenario = pickle.name;
     const videoPath = await this.page?.video()?.path();
+    
+    // Check if this is a navigation test for enhanced artifact collection
+    const isNavigationTest = pickle.tags?.some(tag => tag.name === '@navigation');
+    
     if (status === Status.FAILED) {
-        const image = await this.page?.screenshot({ path: `./test-results/screenshots/${scenario} (${line}).png`, fullPage: true });
+        // Enhanced screenshot naming for navigation tests
+        const screenshotName = isNavigationTest 
+            ? `navigation-error-${scenario.toLowerCase().replace(/\s+/g, '-')}-${line}`
+            : `${scenario} (${line})`;
+            
+        const image = await this.page?.screenshot({ 
+            path: `./test-results/screenshots/${screenshotName}.png`, 
+            fullPage: true 
+        });
         await this.attach(image, 'image/png');
+        
+        // Collect additional navigation-specific debugging info
+        if (isNavigationTest) {
+            try {
+                // Capture current URL for navigation debugging
+                const currentUrl = this.page?.url();
+                Log.info(`Navigation test failed - Current URL: ${currentUrl}`);
+                
+                // Capture viewport information
+                const viewport = this.page?.viewportSize();
+                Log.info(`Navigation test failed - Viewport: ${JSON.stringify(viewport)}`);
+                
+                // Capture page title for validation debugging
+                const pageTitle = await this.page?.title();
+                Log.info(`Navigation test failed - Page Title: ${pageTitle}`);
+                
+                // Capture console errors if any
+                const consoleMessages = await this.page?.evaluate(() => {
+                    return window.console ? 'Console available' : 'No console';
+                });
+                Log.info(`Navigation test failed - Console status: ${consoleMessages}`);
+                
+            } catch (debugError) {
+                Log.error(`Failed to collect navigation debugging info: ${debugError.message}`);
+            }
+        }
+        
         Log.error(`${scenario}: ${line} - ${status}\n${result.message}`);
     }
+    
     await this.page?.close();
     await this.context?.close();
+    
     if (process.env.RECORD_VIDEO === "true") {
         if (status === Status.FAILED) {
-            fse.renameSync(videoPath, `./test-results/videos/${scenario}(${line}).webm`);            
-            await this.attach(fse.readFileSync(`./test-results/videos/${scenario}(${line}).webm`), 'video/webm');
+            const videoName = isNavigationTest 
+                ? `navigation-error-${scenario.toLowerCase().replace(/\s+/g, '-')}-${line}.webm`
+                : `${scenario}(${line}).webm`;
+                
+            fse.renameSync(videoPath, `./test-results/videos/${videoName}`);            
+            await this.attach(fse.readFileSync(`./test-results/videos/${videoName}`), 'video/webm');
         } else {
             fse.unlinkSync(videoPath);
         }
     }
+    
     Log.testEnd(`${scenario}: ${line}`, status);
 });

@@ -1,5 +1,5 @@
 import { ICreateAttachment } from '@cucumber/cucumber/lib/runtime/attachment_manager';
-import winston from 'winston';
+import * as winston from 'winston';
 
 const Logger = winston.createLogger({
     transports: [

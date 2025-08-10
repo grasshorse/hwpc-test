@@ -477,8 +477,8 @@ export default class ReportsPage extends NavigationPage {
      */
     private async applyTypeFilter(type: string): Promise<void> {
         try {
-            const typeFilter = this.web.dropDown(this.REPORT_TYPE_FILTER, "Type Filter");
-            const isFilterVisible = await typeFilter.isVisible(2);
+            const typeFilter = this.web.dropdown(this.REPORT_TYPE_FILTER, "Type Filter");
+            const isFilterVisible = await this.web.element(this.REPORT_TYPE_FILTER, "Type Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await typeFilter.selectByVisibleText(type);
@@ -513,8 +513,8 @@ export default class ReportsPage extends NavigationPage {
      */
     private async applyCategoryFilter(category: string): Promise<void> {
         try {
-            const categoryFilter = this.web.dropDown(this.REPORT_CATEGORY_FILTER, "Category Filter");
-            const isFilterVisible = await categoryFilter.isVisible(2);
+            const categoryFilter = this.web.dropdown(this.REPORT_CATEGORY_FILTER, "Category Filter");
+            const isFilterVisible = await this.web.element(this.REPORT_CATEGORY_FILTER, "Category Filter").isVisible(2);
             
             if (isFilterVisible) {
                 await categoryFilter.selectByVisibleText(category);

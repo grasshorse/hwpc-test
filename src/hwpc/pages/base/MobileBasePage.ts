@@ -395,7 +395,7 @@ export default abstract class MobileBasePage extends BasePage {
             const isLoadingVisible = await this.web.element(mobileLoadingSelector, "Mobile Loading").isVisible(1);
             
             if (isLoadingVisible) {
-                await this.web.element(mobileLoadingSelector, "Mobile Loading").waitTillInvisible(Constants.MOBILE_NETWORK_TIMEOUT);
+                await this.web.element(mobileLoadingSelector, "Mobile Loading").waitTillInvisible();
             }
             
             // Check for skeleton loaders
@@ -403,7 +403,7 @@ export default abstract class MobileBasePage extends BasePage {
             const isSkeletonVisible = await this.web.element(skeletonSelector, "Skeleton Loader").isVisible(1);
             
             if (isSkeletonVisible) {
-                await this.web.element(skeletonSelector, "Skeleton Loader").waitTillInvisible(Constants.MOBILE_NETWORK_TIMEOUT);
+                await this.web.element(skeletonSelector, "Skeleton Loader").waitTillInvisible();
             }
             
             console.log("Mobile loading completed");
